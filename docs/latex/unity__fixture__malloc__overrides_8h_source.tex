@@ -1,0 +1,53 @@
+\doxysection{unity\+\_\+fixture\+\_\+malloc\+\_\+overrides.\+h}
+\hypertarget{unity__fixture__malloc__overrides_8h_source}{}\label{unity__fixture__malloc__overrides_8h_source}\index{lib/cJSON/tests/unity/extras/fixture/src/unity\_fixture\_malloc\_overrides.h@{lib/cJSON/tests/unity/extras/fixture/src/unity\_fixture\_malloc\_overrides.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ (c)\ 2010\ James\ Grenning\ and\ Contributed\ to\ Unity\ Project}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ ==========================================}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *\ \ Unity\ Project\ -\/\ A\ Test\ Framework\ for\ C}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ \ Copyright\ (c)\ 2007\ Mike\ Karlesky,\ Mark\ VanderVoord,\ Greg\ Williams}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ \ [Released\ under\ MIT\ License.\ Please\ refer\ to\ license.txt\ for\ details]}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ ==========================================\ */}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#ifndef\ UNITY\_FIXTURE\_MALLOC\_OVERRIDES\_H\_}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#define\ UNITY\_FIXTURE\_MALLOC\_OVERRIDES\_H\_}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#ifdef\ UNITY\_EXCLUDE\_STDLIB\_MALLOC}}
+\DoxyCodeLine{00014\ \textcolor{comment}{/*\ Define\ this\ macro\ to\ remove\ the\ use\ of\ stdlib.h,\ malloc,\ and\ free.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ Many\ embedded\ systems\ do\ not\ have\ a\ heap\ or\ malloc/free\ by\ default.}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ This\ internal\ unity\_malloc()\ provides\ allocated\ memory\ deterministically\ from}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ the\ end\ of\ an\ array\ only,\ unity\_free()\ only\ releases\ from\ end-\/of-\/array,}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ blocks\ are\ not\ coalesced,\ and\ memory\ not\ freed\ in\ LIFO\ order\ is\ stranded.\ */}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\ \ \ \ \#ifndef\ UNITY\_INTERNAL\_HEAP\_SIZE\_BYTES}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\ \ \ \ \#define\ UNITY\_INTERNAL\_HEAP\_SIZE\_BYTES\ 256}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{comment}{/*\ These\ functions\ are\ used\ by\ the\ Unity\ Fixture\ to\ allocate\ and\ release\ memory}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ *\ on\ the\ heap\ and\ can\ be\ overridden\ with\ platform-\/specific\ implementations.}}
+\DoxyCodeLine{00026\ \textcolor{comment}{\ *\ For\ example,\ when\ using\ FreeRTOS\ UNITY\_FIXTURE\_MALLOC\ becomes\ pvPortMalloc()}}
+\DoxyCodeLine{00027\ \textcolor{comment}{\ *\ and\ UNITY\_FIXTURE\_FREE\ becomes\ vPortFree().\ */}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#if\ !defined(UNITY\_FIXTURE\_MALLOC)\ ||\ !defined(UNITY\_FIXTURE\_FREE)}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\ \ \ \ \#include\ <stdlib.h>}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ \ \#define\ UNITY\_FIXTURE\_MALLOC(size)\ malloc(size)}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\ \ \ \ \#define\ UNITY\_FIXTURE\_FREE(ptr)\ \ \ \ free(ptr)}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}*\ UNITY\_FIXTURE\_MALLOC(\textcolor{keywordtype}{size\_t}\ size);}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ UNITY\_FIXTURE\_FREE(\textcolor{keywordtype}{void}*\ ptr);}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ malloc\ \ unity\_malloc}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#define\ calloc\ \ unity\_calloc}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#define\ realloc\ unity\_realloc}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#define\ free\ \ \ \ unity\_free}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{keywordtype}{void}*\ unity\_malloc(\textcolor{keywordtype}{size\_t}\ size);}
+\DoxyCodeLine{00043\ \textcolor{keywordtype}{void}*\ unity\_calloc(\textcolor{keywordtype}{size\_t}\ num,\ \textcolor{keywordtype}{size\_t}\ size);}
+\DoxyCodeLine{00044\ \textcolor{keywordtype}{void}*\ unity\_realloc(\textcolor{keywordtype}{void}\ *\ oldMem,\ \textcolor{keywordtype}{size\_t}\ size);}
+\DoxyCodeLine{00045\ \textcolor{keywordtype}{void}\ unity\_free(\textcolor{keywordtype}{void}\ *\ mem);}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ UNITY\_FIXTURE\_MALLOC\_OVERRIDES\_H\_\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

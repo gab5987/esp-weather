@@ -1,0 +1,18 @@
+\doxysection{Unity\+Helper.\+h}
+\hypertarget{_unity_helper_8h_source}{}\label{_unity_helper_8h_source}\index{lib/cJSON/tests/unity/examples/example\_3/helper/UnityHelper.h@{lib/cJSON/tests/unity/examples/example\_3/helper/UnityHelper.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ \_TESTHELPER\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ \_TESTHELPER\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}Types.h"{}}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{keywordtype}{void}\ AssertEqualExampleStruct(\textcolor{keyword}{const}\ EXAMPLE\_STRUCT\_T\ expected,\ \textcolor{keyword}{const}\ EXAMPLE\_STRUCT\_T\ actual,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ line);}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_EXAMPLE\_STRUCT\_T(expected,\ actual,\ line,\ message)\ AssertEqualExampleStruct(expected,\ actual,\ line);}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ TEST\_ASSERT\_EQUAL\_EXAMPLE\_STRUCT\_T(expected,\ actual)\ UNITY\_TEST\_ASSERT\_EQUAL\_EXAMPLE\_STRUCT\_T(expected,\ actual,\ \_\_LINE\_\_,\ NULL);}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_TESTHELPER\_H}}
+
+\end{DoxyCode}

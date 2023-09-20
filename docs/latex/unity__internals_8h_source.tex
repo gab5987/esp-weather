@@ -1,0 +1,876 @@
+\doxysection{unity\+\_\+internals.\+h}
+\hypertarget{unity__internals_8h_source}{}\label{unity__internals_8h_source}\index{lib/cJSON/tests/unity/src/unity\_internals.h@{lib/cJSON/tests/unity/src/unity\_internals.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ ==========================================}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ \ \ \ Unity\ Project\ -\/\ A\ Test\ Framework\ for\ C}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ \ \ \ Copyright\ (c)\ 2007-\/14\ Mike\ Karlesky,\ Mark\ VanderVoord,\ Greg\ Williams}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ \ \ \ [Released\ under\ MIT\ License.\ Please\ refer\ to\ license.txt\ for\ details]}}
+\DoxyCodeLine{00005\ \textcolor{comment}{==========================================\ */}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#ifndef\ UNITY\_INTERNALS\_H}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#define\ UNITY\_INTERNALS\_H}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}../examples/unity\_config.h"{}}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_SETJMP\_H}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ <setjmp.h>}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_MATH\_H}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#include\ <math.h>}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{comment}{/*\ Unity\ Attempts\ to\ Auto-\/Detect\ Integer\ Types}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ Attempt\ 1:\ UINT\_MAX,\ ULONG\_MAX\ in\ <limits.h>,\ or\ default\ to\ 32\ bits}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ *\ Attempt\ 2:\ UINTPTR\_MAX\ in\ <stdint.h>,\ or\ default\ to\ same\ size\ as\ long}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ The\ user\ may\ override\ any\ of\ these\ derived\ constants:}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ *\ UNITY\_INT\_WIDTH,\ UNITY\_LONG\_WIDTH,\ UNITY\_POINTER\_WIDTH\ */}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_STDINT\_H}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_LIMITS\_H}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ <limits.h>}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00034\ \textcolor{comment}{\ *\ Guess\ Widths\ If\ Not\ Specified}}
+\DoxyCodeLine{00035\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \textcolor{comment}{/*\ Determine\ the\ size\ of\ an\ int,\ if\ not\ already\ specified.}}
+\DoxyCodeLine{00038\ \textcolor{comment}{\ *\ We\ cannot\ use\ sizeof(int),\ because\ it\ is\ not\ yet\ defined}}
+\DoxyCodeLine{00039\ \textcolor{comment}{\ *\ at\ this\ stage\ in\ the\ translation\ of\ the\ C\ program.}}
+\DoxyCodeLine{00040\ \textcolor{comment}{\ *\ Therefore,\ infer\ it\ from\ UINT\_MAX\ if\ possible.\ */}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#ifndef\ UNITY\_INT\_WIDTH}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \#ifdef\ UINT\_MAX}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ \ \#if\ (UINT\_MAX\ ==\ 0xFFFF)}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\ \ \ \ \ \ \#define\ UNITY\_INT\_WIDTH\ (16)}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\ \ \ \ \#elif\ (UINT\_MAX\ ==\ 0xFFFFFFFF)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ \ \ \ \#define\ UNITY\_INT\_WIDTH\ (32)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ \#elif\ (UINT\_MAX\ ==\ 0xFFFFFFFFFFFFFFFF)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \ \ \ \#define\ UNITY\_INT\_WIDTH\ (64)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ \#else\ }\textcolor{comment}{/*\ Set\ to\ default\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ \ \#define\ UNITY\_INT\_WIDTH\ (32)}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \#endif\ }\textcolor{comment}{/*\ UINT\_MAX\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \textcolor{comment}{/*\ Determine\ the\ size\ of\ a\ long,\ if\ not\ already\ specified.\ */}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#ifndef\ UNITY\_LONG\_WIDTH}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \#ifdef\ ULONG\_MAX}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\ \ \ \ \#if\ (ULONG\_MAX\ ==\ 0xFFFF)}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\ \ \ \ \ \ \#define\ UNITY\_LONG\_WIDTH\ (16)}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\ \ \ \ \#elif\ (ULONG\_MAX\ ==\ 0xFFFFFFFF)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ \ \ \#define\ UNITY\_LONG\_WIDTH\ (32)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \ \#elif\ (ULONG\_MAX\ ==\ 0xFFFFFFFFFFFFFFFF)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ \ \ \ \#define\ UNITY\_LONG\_WIDTH\ (64)}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\ \ \#else\ }\textcolor{comment}{/*\ Set\ to\ default\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\ \ \ \ \#define\ UNITY\_LONG\_WIDTH\ (32)}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\ \ \#endif\ }\textcolor{comment}{/*\ ULONG\_MAX\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{comment}{/*\ Determine\ the\ size\ of\ a\ pointer,\ if\ not\ already\ specified.\ */}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\#ifndef\ UNITY\_POINTER\_WIDTH}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\ \ \#ifdef\ UINTPTR\_MAX}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\ \ \ \ \#if\ (UINTPTR\_MAX\ <=\ 0xFFFF)}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\ \ \ \ \ \ \#define\ UNITY\_POINTER\_WIDTH\ (16)}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\ \ \ \ \#elif\ (UINTPTR\_MAX\ <=\ 0xFFFFFFFF)}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\ \ \ \ \ \ \#define\ UNITY\_POINTER\_WIDTH\ (32)}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\ \ \ \ \#elif\ (UINTPTR\_MAX\ <=\ 0xFFFFFFFFFFFFFFFF)}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\ \ \ \ \ \ \#define\ UNITY\_POINTER\_WIDTH\ (64)}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\ \ \#else\ }\textcolor{comment}{/*\ Set\ to\ default\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\ \ \ \ \#define\ UNITY\_POINTER\_WIDTH\ UNITY\_LONG\_WIDTH}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\ \ \#endif\ }\textcolor{comment}{/*\ UINTPTR\_MAX\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00086\ \textcolor{comment}{\ *\ Int\ Support\ (Define\ types\ based\ on\ detected\ sizes)}}
+\DoxyCodeLine{00087\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#if\ (UNITY\_INT\_WIDTH\ ==\ 32)}}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \ \ UNITY\_UINT8;}
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ \ UNITY\_UINT16;}
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \ \ \ UNITY\_UINT32;}
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{char}\ \ \ \ \ UNITY\_INT8;}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{short}\ \ \ \ UNITY\_INT16;}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{int}\ \ \ \ \ \ UNITY\_INT32;}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\#elif\ (UNITY\_INT\_WIDTH\ ==\ 16)}}
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \ \ UNITY\_UINT8;}
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \ \ \ UNITY\_UINT16;}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \ \ UNITY\_UINT32;}
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{char}\ \ \ \ \ UNITY\_INT8;}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{int}\ \ \ \ \ \ UNITY\_INT16;}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{long}\ \ \ \ \ UNITY\_INT32;}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\ \ \ \ \#error\ Invalid\ UNITY\_INT\_WIDTH\ specified!\ (16\ or\ 32\ are\ supported)}}
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00108\ \textcolor{comment}{\ *\ 64-\/bit\ Support}}
+\DoxyCodeLine{00109\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\#ifndef\ UNITY\_SUPPORT\_64}}
+\DoxyCodeLine{00112\ \textcolor{preprocessor}{\ \ \#if\ UNITY\_LONG\_WIDTH\ ==\ 64\ ||\ UNITY\_POINTER\_WIDTH\ ==\ 64}}
+\DoxyCodeLine{00113\ \textcolor{preprocessor}{\ \ \ \ \#define\ UNITY\_SUPPORT\_64}}
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\#ifndef\ UNITY\_SUPPORT\_64}}
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{comment}{/*\ No\ 64-\/bit\ Support\ */}}
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keyword}{typedef}\ UNITY\_UINT32\ UNITY\_UINT;}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{keyword}{typedef}\ UNITY\_INT32\ UNITY\_INT;}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{comment}{/*\ 64-\/bit\ Support\ */}}
+\DoxyCodeLine{00124\ \textcolor{preprocessor}{\ \ \#if\ (UNITY\_LONG\_WIDTH\ ==\ 32)}}
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ UNITY\_UINT64;}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ \ \ UNITY\_INT64;}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\ \ \#elif\ (UNITY\_LONG\_WIDTH\ ==\ 64)}}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \ \ \ \ \ UNITY\_UINT64;}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{long}\ \ \ \ \ \ \ \ UNITY\_INT64;}
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\ \ \#else}}
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\ \ \ \ \#error\ Invalid\ UNITY\_LONG\_WIDTH\ specified!\ (32\ or\ 64\ are\ supported)}}
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keyword}{typedef}\ UNITY\_UINT64\ UNITY\_UINT;}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keyword}{typedef}\ UNITY\_INT64\ UNITY\_INT;}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00139\ \textcolor{comment}{\ *\ Pointer\ Support}}
+\DoxyCodeLine{00140\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\#if\ (UNITY\_POINTER\_WIDTH\ ==\ 32)}}
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\#define\ UNITY\_PTR\_TO\_INT\ UNITY\_INT32}}
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\#define\ UNITY\_DISPLAY\_STYLE\_POINTER\ UNITY\_DISPLAY\_STYLE\_HEX32}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\#elif\ (UNITY\_POINTER\_WIDTH\ ==\ 64)}}
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\#define\ UNITY\_PTR\_TO\_INT\ UNITY\_INT64}}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\#define\ UNITY\_DISPLAY\_STYLE\_POINTER\ UNITY\_DISPLAY\_STYLE\_HEX64}}
+\DoxyCodeLine{00148\ \textcolor{preprocessor}{\#elif\ (UNITY\_POINTER\_WIDTH\ ==\ 16)}}
+\DoxyCodeLine{00149\ \textcolor{preprocessor}{\#define\ UNITY\_PTR\_TO\_INT\ UNITY\_INT16}}
+\DoxyCodeLine{00150\ \textcolor{preprocessor}{\#define\ UNITY\_DISPLAY\_STYLE\_POINTER\ UNITY\_DISPLAY\_STYLE\_HEX16}}
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00152\ \textcolor{preprocessor}{\ \ \ \ \#error\ Invalid\ UNITY\_POINTER\_WIDTH\ specified!\ (16,\ 32\ or\ 64\ are\ supported)}}
+\DoxyCodeLine{00153\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ \textcolor{preprocessor}{\#ifndef\ UNITY\_PTR\_ATTRIBUTE}}
+\DoxyCodeLine{00156\ \textcolor{preprocessor}{\#define\ UNITY\_PTR\_ATTRIBUTE}}
+\DoxyCodeLine{00157\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \textcolor{preprocessor}{\#ifndef\ UNITY\_INTERNAL\_PTR}}
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\#define\ UNITY\_INTERNAL\_PTR\ UNITY\_PTR\_ATTRIBUTE\ const\ void*}}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00164\ \textcolor{comment}{\ *\ Float\ Support}}
+\DoxyCodeLine{00165\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \textcolor{preprocessor}{\#ifdef\ UNITY\_EXCLUDE\_FLOAT}}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \textcolor{comment}{/*\ No\ Floating\ Point\ Support\ */}}
+\DoxyCodeLine{00170\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_DOUBLE}}
+\DoxyCodeLine{00171\ \textcolor{preprocessor}{\#define\ UNITY\_EXCLUDE\_DOUBLE\ }\textcolor{comment}{/*\ Remove\ double\ when\ excluding\ float\ support\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00172\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00173\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_FLOAT\_PRINT}}
+\DoxyCodeLine{00174\ \textcolor{preprocessor}{\#define\ UNITY\_EXCLUDE\_FLOAT\_PRINT}}
+\DoxyCodeLine{00175\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \textcolor{comment}{/*\ Floating\ Point\ Support\ */}}
+\DoxyCodeLine{00180\ \textcolor{preprocessor}{\#ifndef\ UNITY\_FLOAT\_PRECISION}}
+\DoxyCodeLine{00181\ \textcolor{preprocessor}{\#define\ UNITY\_FLOAT\_PRECISION\ (0.00001f)}}
+\DoxyCodeLine{00182\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00183\ \textcolor{preprocessor}{\#ifndef\ UNITY\_FLOAT\_TYPE}}
+\DoxyCodeLine{00184\ \textcolor{preprocessor}{\#define\ UNITY\_FLOAT\_TYPE\ float}}
+\DoxyCodeLine{00185\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00186\ \textcolor{keyword}{typedef}\ UNITY\_FLOAT\_TYPE\ UNITY\_FLOAT;}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \textcolor{comment}{/*\ isinf\ \&\ isnan\ macros\ should\ be\ provided\ by\ math.h\ */}}
+\DoxyCodeLine{00189\ \textcolor{preprocessor}{\#ifndef\ isinf}}
+\DoxyCodeLine{00190\ \textcolor{comment}{/*\ The\ value\ of\ Inf\ -\/\ Inf\ is\ NaN\ */}}
+\DoxyCodeLine{00191\ \textcolor{preprocessor}{\#define\ isinf(n)\ (isnan((n)\ -\/\ (n))\ \&\&\ !isnan(n))}}
+\DoxyCodeLine{00192\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \textcolor{preprocessor}{\#ifndef\ isnan}}
+\DoxyCodeLine{00195\ \textcolor{comment}{/*\ NaN\ is\ the\ only\ floating\ point\ value\ that\ does\ NOT\ equal\ itself.}}
+\DoxyCodeLine{00196\ \textcolor{comment}{\ *\ Therefore\ if\ n\ !=\ n,\ then\ it\ is\ NaN.\ */}}
+\DoxyCodeLine{00197\ \textcolor{preprocessor}{\#define\ isnan(n)\ ((n\ !=\ n)\ ?\ 1\ :\ 0)}}
+\DoxyCodeLine{00198\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00203\ \textcolor{comment}{\ *\ Double\ Float\ Support}}
+\DoxyCodeLine{00204\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00205\ }
+\DoxyCodeLine{00206\ \textcolor{comment}{/*\ unlike\ float,\ we\ DON'T\ include\ by\ default\ */}}
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{\#if\ defined(UNITY\_EXCLUDE\_DOUBLE)\ ||\ !defined(UNITY\_INCLUDE\_DOUBLE)}}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ \textcolor{comment}{/*\ No\ Floating\ Point\ Support\ */}}
+\DoxyCodeLine{00210\ \textcolor{preprocessor}{\ \ \#ifndef\ UNITY\_EXCLUDE\_DOUBLE}}
+\DoxyCodeLine{00211\ \textcolor{preprocessor}{\ \ \#define\ UNITY\_EXCLUDE\_DOUBLE}}
+\DoxyCodeLine{00212\ \textcolor{preprocessor}{\ \ \#else}}
+\DoxyCodeLine{00213\ \textcolor{preprocessor}{\ \ \ \ \#undef\ UNITY\_INCLUDE\_DOUBLE}}
+\DoxyCodeLine{00214\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \textcolor{preprocessor}{\ \ \#ifndef\ UNITY\_EXCLUDE\_FLOAT}}
+\DoxyCodeLine{00217\ \textcolor{preprocessor}{\ \ \ \ \#ifndef\ UNITY\_DOUBLE\_TYPE}}
+\DoxyCodeLine{00218\ \textcolor{preprocessor}{\ \ \ \ \#define\ UNITY\_DOUBLE\_TYPE\ double}}
+\DoxyCodeLine{00219\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{00220\ \ \ \textcolor{keyword}{typedef}\ UNITY\_FLOAT\ UNITY\_DOUBLE;}
+\DoxyCodeLine{00221\ \ \ \textcolor{comment}{/*\ For\ parameter\ in\ UnityPrintFloat(UNITY\_DOUBLE),\ which\ aliases\ to\ double\ or\ float\ */}}
+\DoxyCodeLine{00222\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ \textcolor{comment}{/*\ Double\ Floating\ Point\ Support\ */}}
+\DoxyCodeLine{00227\ \textcolor{preprocessor}{\ \ \#ifndef\ UNITY\_DOUBLE\_PRECISION}}
+\DoxyCodeLine{00228\ \textcolor{preprocessor}{\ \ \#define\ UNITY\_DOUBLE\_PRECISION\ (1e-\/12)}}
+\DoxyCodeLine{00229\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \textcolor{preprocessor}{\ \ \#ifndef\ UNITY\_DOUBLE\_TYPE}}
+\DoxyCodeLine{00232\ \textcolor{preprocessor}{\ \ \#define\ UNITY\_DOUBLE\_TYPE\ double}}
+\DoxyCodeLine{00233\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00234\ \ \ \textcolor{keyword}{typedef}\ UNITY\_DOUBLE\_TYPE\ UNITY\_DOUBLE;}
+\DoxyCodeLine{00235\ }
+\DoxyCodeLine{00236\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00239\ \textcolor{comment}{\ *\ Output\ Method:\ stdout\ (DEFAULT)}}
+\DoxyCodeLine{00240\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00241\ \textcolor{preprocessor}{\#ifndef\ UNITY\_OUTPUT\_CHAR}}
+\DoxyCodeLine{00242\ \textcolor{comment}{/*\ Default\ to\ using\ putchar,\ which\ is\ defined\ in\ stdio.h\ */}}
+\DoxyCodeLine{00243\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{00244\ \textcolor{preprocessor}{\#define\ UNITY\_OUTPUT\_CHAR(a)\ (void)putchar(a)}}
+\DoxyCodeLine{00245\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00246\ \ \ \textcolor{comment}{/*\ If\ defined\ as\ something\ else,\ make\ sure\ we\ declare\ it\ here\ so\ it's\ ready\ for\ use\ */}}
+\DoxyCodeLine{00247\ \textcolor{preprocessor}{\ \ \#ifdef\ UNITY\_OUTPUT\_CHAR\_HEADER\_DECLARATION}}
+\DoxyCodeLine{00248\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ UNITY\_OUTPUT\_CHAR\_HEADER\_DECLARATION;}
+\DoxyCodeLine{00249\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00250\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00252\ \textcolor{preprocessor}{\#ifndef\ UNITY\_OUTPUT\_FLUSH}}
+\DoxyCodeLine{00253\ \textcolor{preprocessor}{\#ifdef\ UNITY\_USE\_FLUSH\_STDOUT}}
+\DoxyCodeLine{00254\ \textcolor{comment}{/*\ We\ want\ to\ use\ the\ stdout\ flush\ utility\ */}}
+\DoxyCodeLine{00255\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{00256\ \textcolor{preprocessor}{\#define\ UNITY\_OUTPUT\_FLUSH()\ (void)fflush(stdout)}}
+\DoxyCodeLine{00257\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00258\ \textcolor{comment}{/*\ We've\ specified\ nothing,\ therefore\ flush\ should\ just\ be\ ignored\ */}}
+\DoxyCodeLine{00259\ \textcolor{preprocessor}{\#define\ UNITY\_OUTPUT\_FLUSH()}}
+\DoxyCodeLine{00260\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00261\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00262\ \textcolor{comment}{/*\ We've\ defined\ flush\ as\ something\ else,\ so\ make\ sure\ we\ declare\ it\ here\ so\ it's\ ready\ for\ use\ */}}
+\DoxyCodeLine{00263\ \textcolor{preprocessor}{\#ifdef\ UNITY\_OUTPUT\_FLUSH\_HEADER\_DECLARATION}}
+\DoxyCodeLine{00264\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ UNITY\_OMIT\_OUTPUT\_FLUSH\_HEADER\_DECLARATION;}
+\DoxyCodeLine{00265\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00266\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00267\ }
+\DoxyCodeLine{00268\ \textcolor{preprocessor}{\#ifndef\ UNITY\_OUTPUT\_FLUSH}}
+\DoxyCodeLine{00269\ \textcolor{preprocessor}{\#define\ UNITY\_FLUSH\_CALL()}}
+\DoxyCodeLine{00270\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00271\ \textcolor{preprocessor}{\#define\ UNITY\_FLUSH\_CALL()\ UNITY\_OUTPUT\_FLUSH()}}
+\DoxyCodeLine{00272\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00273\ }
+\DoxyCodeLine{00274\ \textcolor{preprocessor}{\#ifndef\ UNITY\_PRINT\_EOL}}
+\DoxyCodeLine{00275\ \textcolor{preprocessor}{\#define\ UNITY\_PRINT\_EOL()\ \ \ \ UNITY\_OUTPUT\_CHAR('\(\backslash\)n')}}
+\DoxyCodeLine{00276\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00277\ }
+\DoxyCodeLine{00278\ \textcolor{preprocessor}{\#ifndef\ UNITY\_OUTPUT\_START}}
+\DoxyCodeLine{00279\ \textcolor{preprocessor}{\#define\ UNITY\_OUTPUT\_START()}}
+\DoxyCodeLine{00280\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00282\ \textcolor{preprocessor}{\#ifndef\ UNITY\_OUTPUT\_COMPLETE}}
+\DoxyCodeLine{00283\ \textcolor{preprocessor}{\#define\ UNITY\_OUTPUT\_COMPLETE()}}
+\DoxyCodeLine{00284\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00285\ }
+\DoxyCodeLine{00286\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00287\ \textcolor{comment}{\ *\ Footprint}}
+\DoxyCodeLine{00288\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \textcolor{preprocessor}{\#ifndef\ UNITY\_LINE\_TYPE}}
+\DoxyCodeLine{00291\ \textcolor{preprocessor}{\#define\ UNITY\_LINE\_TYPE\ UNITY\_UINT}}
+\DoxyCodeLine{00292\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00294\ \textcolor{preprocessor}{\#ifndef\ UNITY\_COUNTER\_TYPE}}
+\DoxyCodeLine{00295\ \textcolor{preprocessor}{\#define\ UNITY\_COUNTER\_TYPE\ UNITY\_UINT}}
+\DoxyCodeLine{00296\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00297\ }
+\DoxyCodeLine{00298\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00299\ \textcolor{comment}{\ *\ Language\ Features\ Available}}
+\DoxyCodeLine{00300\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00301\ \textcolor{preprocessor}{\#if\ !defined(UNITY\_WEAK\_ATTRIBUTE)\ \&\&\ !defined(UNITY\_WEAK\_PRAGMA)}}
+\DoxyCodeLine{00302\ \textcolor{preprocessor}{\#\ \ \ if\ defined(\_\_GNUC\_\_)\ ||\ defined(\_\_ghs\_\_)\ }\textcolor{comment}{/*\ \_\_GNUC\_\_\ includes\ clang\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00303\ \textcolor{preprocessor}{\#\ \ \ \ \ \ \ if\ !(defined(\_\_WIN32\_\_)\ \&\&\ defined(\_\_clang\_\_))\ \&\&\ !defined(\_\_TMS470\_\_)}}
+\DoxyCodeLine{00304\ \textcolor{preprocessor}{\#\ \ \ \ \ \ \ \ \ \ \ define\ UNITY\_WEAK\_ATTRIBUTE\ \_\_attribute\_\_((weak))}}
+\DoxyCodeLine{00305\ \textcolor{preprocessor}{\#\ \ \ \ \ \ \ endif}}
+\DoxyCodeLine{00306\ \textcolor{preprocessor}{\#\ \ \ endif}}
+\DoxyCodeLine{00307\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00308\ }
+\DoxyCodeLine{00309\ \textcolor{preprocessor}{\#ifdef\ UNITY\_NO\_WEAK}}
+\DoxyCodeLine{00310\ \textcolor{preprocessor}{\#\ \ \ undef\ UNITY\_WEAK\_ATTRIBUTE}}
+\DoxyCodeLine{00311\ \textcolor{preprocessor}{\#\ \ \ undef\ UNITY\_WEAK\_PRAGMA}}
+\DoxyCodeLine{00312\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ }
+\DoxyCodeLine{00315\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00316\ \textcolor{comment}{\ *\ Internal\ Structs\ Needed}}
+\DoxyCodeLine{00317\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00318\ }
+\DoxyCodeLine{00319\ \textcolor{keyword}{typedef}\ void\ (*UnityTestFunction)(void);}
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00321\ \textcolor{preprocessor}{\#define\ UNITY\_DISPLAY\_RANGE\_INT\ \ (0x10)}}
+\DoxyCodeLine{00322\ \textcolor{preprocessor}{\#define\ UNITY\_DISPLAY\_RANGE\_UINT\ (0x20)}}
+\DoxyCodeLine{00323\ \textcolor{preprocessor}{\#define\ UNITY\_DISPLAY\_RANGE\_HEX\ \ (0x40)}}
+\DoxyCodeLine{00324\ }
+\DoxyCodeLine{00325\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}}
+\DoxyCodeLine{00326\ \{}
+\DoxyCodeLine{00327\ UNITY\_DISPLAY\_STYLE\_INT\ =\ \textcolor{keyword}{sizeof}(int)+\ UNITY\_DISPLAY\_RANGE\_INT,}
+\DoxyCodeLine{00328\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_INT8\ \ \ \ \ =\ 1\ +\ UNITY\_DISPLAY\_RANGE\_INT,}
+\DoxyCodeLine{00329\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_INT16\ \ \ \ =\ 2\ +\ UNITY\_DISPLAY\_RANGE\_INT,}
+\DoxyCodeLine{00330\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_INT32\ \ \ \ =\ 4\ +\ UNITY\_DISPLAY\_RANGE\_INT,}
+\DoxyCodeLine{00331\ \#ifdef\ UNITY\_SUPPORT\_64}
+\DoxyCodeLine{00332\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_INT64\ \ \ \ =\ 8\ +\ UNITY\_DISPLAY\_RANGE\_INT,}
+\DoxyCodeLine{00333\ \#endif}
+\DoxyCodeLine{00334\ }
+\DoxyCodeLine{00335\ UNITY\_DISPLAY\_STYLE\_UINT\ =\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned})\ +\ UNITY\_DISPLAY\_RANGE\_UINT,}
+\DoxyCodeLine{00336\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_UINT8\ \ \ \ =\ 1\ +\ UNITY\_DISPLAY\_RANGE\_UINT,}
+\DoxyCodeLine{00337\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_UINT16\ \ \ =\ 2\ +\ UNITY\_DISPLAY\_RANGE\_UINT,}
+\DoxyCodeLine{00338\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_UINT32\ \ \ =\ 4\ +\ UNITY\_DISPLAY\_RANGE\_UINT,}
+\DoxyCodeLine{00339\ \textcolor{preprocessor}{\#ifdef\ UNITY\_SUPPORT\_64}}
+\DoxyCodeLine{00340\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_UINT64\ \ \ =\ 8\ +\ UNITY\_DISPLAY\_RANGE\_UINT,}
+\DoxyCodeLine{00341\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00342\ }
+\DoxyCodeLine{00343\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_HEX8\ \ \ \ \ =\ 1\ +\ UNITY\_DISPLAY\_RANGE\_HEX,}
+\DoxyCodeLine{00344\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_HEX16\ \ \ \ =\ 2\ +\ UNITY\_DISPLAY\_RANGE\_HEX,}
+\DoxyCodeLine{00345\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_HEX32\ \ \ \ =\ 4\ +\ UNITY\_DISPLAY\_RANGE\_HEX,}
+\DoxyCodeLine{00346\ \textcolor{preprocessor}{\#ifdef\ UNITY\_SUPPORT\_64}}
+\DoxyCodeLine{00347\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_HEX64\ \ \ \ =\ 8\ +\ UNITY\_DISPLAY\_RANGE\_HEX,}
+\DoxyCodeLine{00348\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00349\ }
+\DoxyCodeLine{00350\ \ \ \ \ UNITY\_DISPLAY\_STYLE\_UNKNOWN}
+\DoxyCodeLine{00351\ \}\ UNITY\_DISPLAY\_STYLE\_T;}
+\DoxyCodeLine{00352\ }
+\DoxyCodeLine{00353\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}}
+\DoxyCodeLine{00354\ \{}
+\DoxyCodeLine{00355\ \ \ \ \ UNITY\_EQUAL\_TO\ \ \ \ \ \ \ \ \ =\ 1,}
+\DoxyCodeLine{00356\ \ \ \ \ UNITY\_GREATER\_THAN\ \ \ \ \ =\ 2,}
+\DoxyCodeLine{00357\ \ \ \ \ UNITY\_GREATER\_OR\_EQUAL\ =\ 2\ +\ UNITY\_EQUAL\_TO,}
+\DoxyCodeLine{00358\ \ \ \ \ UNITY\_SMALLER\_THAN\ \ \ \ \ =\ 4,}
+\DoxyCodeLine{00359\ \ \ \ \ UNITY\_SMALLER\_OR\_EQUAL\ =\ 4\ +\ UNITY\_EQUAL\_TO}
+\DoxyCodeLine{00360\ \}\ UNITY\_COMPARISON\_T;}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_FLOAT}}
+\DoxyCodeLine{00363\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ UNITY\_FLOAT\_TRAIT}
+\DoxyCodeLine{00364\ \{}
+\DoxyCodeLine{00365\ \ \ \ \ UNITY\_FLOAT\_IS\_NOT\_INF\ \ \ \ \ \ \ =\ 0,}
+\DoxyCodeLine{00366\ \ \ \ \ UNITY\_FLOAT\_IS\_INF,}
+\DoxyCodeLine{00367\ \ \ \ \ UNITY\_FLOAT\_IS\_NOT\_NEG\_INF,}
+\DoxyCodeLine{00368\ \ \ \ \ UNITY\_FLOAT\_IS\_NEG\_INF,}
+\DoxyCodeLine{00369\ \ \ \ \ UNITY\_FLOAT\_IS\_NOT\_NAN,}
+\DoxyCodeLine{00370\ \ \ \ \ UNITY\_FLOAT\_IS\_NAN,}
+\DoxyCodeLine{00371\ \ \ \ \ UNITY\_FLOAT\_IS\_NOT\_DET,}
+\DoxyCodeLine{00372\ \ \ \ \ UNITY\_FLOAT\_IS\_DET,}
+\DoxyCodeLine{00373\ \ \ \ \ UNITY\_FLOAT\_INVALID\_TRAIT}
+\DoxyCodeLine{00374\ \}\ UNITY\_FLOAT\_TRAIT\_T;}
+\DoxyCodeLine{00375\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00376\ }
+\DoxyCodeLine{00377\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}}
+\DoxyCodeLine{00378\ \{}
+\DoxyCodeLine{00379\ \ \ \ \ UNITY\_ARRAY\_TO\_VAL\ =\ 0,}
+\DoxyCodeLine{00380\ \ \ \ \ UNITY\_ARRAY\_TO\_ARRAY}
+\DoxyCodeLine{00381\ \}\ UNITY\_FLAGS\_T;}
+\DoxyCodeLine{00382\ }
+\DoxyCodeLine{00383\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_n_i_t_y___s_t_o_r_a_g_e___t}{UNITY\_STORAGE\_T}}}
+\DoxyCodeLine{00384\ \{}
+\DoxyCodeLine{00385\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ TestFile;}
+\DoxyCodeLine{00386\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ CurrentTestName;}
+\DoxyCodeLine{00387\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_DETAILS}}
+\DoxyCodeLine{00388\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ CurrentDetail1;}
+\DoxyCodeLine{00389\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ CurrentDetail2;}
+\DoxyCodeLine{00390\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00391\ \ \ \ \ UNITY\_LINE\_TYPE\ CurrentTestLineNumber;}
+\DoxyCodeLine{00392\ \ \ \ \ UNITY\_COUNTER\_TYPE\ NumberOfTests;}
+\DoxyCodeLine{00393\ \ \ \ \ UNITY\_COUNTER\_TYPE\ TestFailures;}
+\DoxyCodeLine{00394\ \ \ \ \ UNITY\_COUNTER\_TYPE\ TestIgnores;}
+\DoxyCodeLine{00395\ \ \ \ \ UNITY\_COUNTER\_TYPE\ CurrentTestFailed;}
+\DoxyCodeLine{00396\ \ \ \ \ UNITY\_COUNTER\_TYPE\ CurrentTestIgnored;}
+\DoxyCodeLine{00397\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_SETJMP\_H}}
+\DoxyCodeLine{00398\ \ \ \ \ jmp\_buf\ AbortFrame;}
+\DoxyCodeLine{00399\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00400\ \};}
+\DoxyCodeLine{00401\ }
+\DoxyCodeLine{00402\ \textcolor{keyword}{extern}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_n_i_t_y___s_t_o_r_a_g_e___t}{UNITY\_STORAGE\_T}}\ Unity;}
+\DoxyCodeLine{00403\ }
+\DoxyCodeLine{00404\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00405\ \textcolor{comment}{\ *\ Test\ Suite\ Management}}
+\DoxyCodeLine{00406\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00407\ }
+\DoxyCodeLine{00408\ \textcolor{keywordtype}{void}\ UnityBegin(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ filename);}
+\DoxyCodeLine{00409\ \textcolor{keywordtype}{int}\ \ UnityEnd(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00410\ \textcolor{keywordtype}{void}\ UnityConcludeTest(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00411\ \textcolor{keywordtype}{void}\ UnityDefaultTestRun(UnityTestFunction\ Func,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ FuncName,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ FuncLineNum);}
+\DoxyCodeLine{00412\ }
+\DoxyCodeLine{00413\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00414\ \textcolor{comment}{\ *\ Details\ Support}}
+\DoxyCodeLine{00415\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00416\ }
+\DoxyCodeLine{00417\ \textcolor{preprocessor}{\#ifdef\ UNITY\_EXCLUDE\_DETAILS}}
+\DoxyCodeLine{00418\ \textcolor{preprocessor}{\#define\ UNITY\_CLR\_DETAILS()}}
+\DoxyCodeLine{00419\ \textcolor{preprocessor}{\#define\ UNITY\_SET\_DETAIL(d1)}}
+\DoxyCodeLine{00420\ \textcolor{preprocessor}{\#define\ UNITY\_SET\_DETAILS(d1,d2)}}
+\DoxyCodeLine{00421\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00422\ \textcolor{preprocessor}{\#define\ UNITY\_CLR\_DETAILS()\ \ \ \ \ \ \{\ Unity.CurrentDetail1\ =\ 0;\ \ \ Unity.CurrentDetail2\ =\ 0;\ \ \}}}
+\DoxyCodeLine{00423\ \textcolor{preprocessor}{\#define\ UNITY\_SET\_DETAIL(d1)\ \ \ \ \ \{\ Unity.CurrentDetail1\ =\ d1;\ \ Unity.CurrentDetail2\ =\ 0;\ \ \}}}
+\DoxyCodeLine{00424\ \textcolor{preprocessor}{\#define\ UNITY\_SET\_DETAILS(d1,d2)\ \{\ Unity.CurrentDetail1\ =\ d1;\ \ Unity.CurrentDetail2\ =\ d2;\ \}}}
+\DoxyCodeLine{00425\ }
+\DoxyCodeLine{00426\ \textcolor{preprocessor}{\#ifndef\ UNITY\_DETAIL1\_NAME}}
+\DoxyCodeLine{00427\ \textcolor{preprocessor}{\#define\ UNITY\_DETAIL1\_NAME\ "{}Function"{}}}
+\DoxyCodeLine{00428\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00429\ }
+\DoxyCodeLine{00430\ \textcolor{preprocessor}{\#ifndef\ UNITY\_DETAIL2\_NAME}}
+\DoxyCodeLine{00431\ \textcolor{preprocessor}{\#define\ UNITY\_DETAIL2\_NAME\ "{}Argument"{}}}
+\DoxyCodeLine{00432\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00433\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00434\ }
+\DoxyCodeLine{00435\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00436\ \textcolor{comment}{\ *\ Test\ Output}}
+\DoxyCodeLine{00437\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00438\ }
+\DoxyCodeLine{00439\ \textcolor{keywordtype}{void}\ UnityPrint(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keywordtype}{string});}
+\DoxyCodeLine{00440\ \textcolor{keywordtype}{void}\ UnityPrintLen(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keywordtype}{string},\ \textcolor{keyword}{const}\ UNITY\_UINT32\ length);}
+\DoxyCodeLine{00441\ \textcolor{keywordtype}{void}\ UnityPrintMask(\textcolor{keyword}{const}\ UNITY\_UINT\ mask,\ \textcolor{keyword}{const}\ UNITY\_UINT\ number);}
+\DoxyCodeLine{00442\ \textcolor{keywordtype}{void}\ UnityPrintNumberByStyle(\textcolor{keyword}{const}\ UNITY\_INT\ number,\ \textcolor{keyword}{const}\ UNITY\_DISPLAY\_STYLE\_T\ style);}
+\DoxyCodeLine{00443\ \textcolor{keywordtype}{void}\ UnityPrintNumber(\textcolor{keyword}{const}\ UNITY\_INT\ number);}
+\DoxyCodeLine{00444\ \textcolor{keywordtype}{void}\ UnityPrintNumberUnsigned(\textcolor{keyword}{const}\ UNITY\_UINT\ number);}
+\DoxyCodeLine{00445\ \textcolor{keywordtype}{void}\ UnityPrintNumberHex(\textcolor{keyword}{const}\ UNITY\_UINT\ number,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ nibbles);}
+\DoxyCodeLine{00446\ }
+\DoxyCodeLine{00447\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_FLOAT\_PRINT}}
+\DoxyCodeLine{00448\ \textcolor{keywordtype}{void}\ UnityPrintFloat(\textcolor{keyword}{const}\ UNITY\_DOUBLE\ input\_number);}
+\DoxyCodeLine{00449\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00450\ }
+\DoxyCodeLine{00451\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00452\ \textcolor{comment}{\ *\ Test\ Assertion\ Functions}}
+\DoxyCodeLine{00453\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00454\ \textcolor{comment}{\ *\ \ Use\ the\ macros\ below\ this\ section\ instead\ of\ calling}}
+\DoxyCodeLine{00455\ \textcolor{comment}{\ *\ \ these\ directly.\ The\ macros\ have\ a\ consistent\ naming}}
+\DoxyCodeLine{00456\ \textcolor{comment}{\ *\ \ convention\ and\ will\ pull\ in\ file\ and\ line\ information}}
+\DoxyCodeLine{00457\ \textcolor{comment}{\ *\ \ for\ you.\ */}}
+\DoxyCodeLine{00458\ }
+\DoxyCodeLine{00459\ \textcolor{keywordtype}{void}\ UnityAssertEqualNumber(\textcolor{keyword}{const}\ UNITY\_INT\ expected,}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_INT\ actual,}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber,}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_DISPLAY\_STYLE\_T\ style);}
+\DoxyCodeLine{00464\ }
+\DoxyCodeLine{00465\ \textcolor{keywordtype}{void}\ UnityAssertGreaterOrLessOrEqualNumber(\textcolor{keyword}{const}\ UNITY\_INT\ threshold,}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_INT\ actual,}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_COMPARISON\_T\ compare,}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *msg,}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber,}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_DISPLAY\_STYLE\_T\ style);}
+\DoxyCodeLine{00471\ }
+\DoxyCodeLine{00472\ \textcolor{keywordtype}{void}\ UnityAssertEqualIntArray(UNITY\_INTERNAL\_PTR\ expected,}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_INTERNAL\_PTR\ actual,}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_UINT32\ num\_elements,}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber,}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_DISPLAY\_STYLE\_T\ style,}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_FLAGS\_T\ flags);}
+\DoxyCodeLine{00479\ }
+\DoxyCodeLine{00480\ \textcolor{keywordtype}{void}\ UnityAssertBits(\textcolor{keyword}{const}\ UNITY\_INT\ mask,}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_INT\ expected,}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_INT\ actual,}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber);}
+\DoxyCodeLine{00485\ }
+\DoxyCodeLine{00486\ \textcolor{keywordtype}{void}\ UnityAssertEqualString(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ expected,}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ actual,}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber);}
+\DoxyCodeLine{00490\ }
+\DoxyCodeLine{00491\ \textcolor{keywordtype}{void}\ UnityAssertEqualStringLen(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ expected,}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ actual,}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_UINT32\ length,}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber);}
+\DoxyCodeLine{00496\ }
+\DoxyCodeLine{00497\ \textcolor{keywordtype}{void}\ UnityAssertEqualStringArray(\ UNITY\_INTERNAL\_PTR\ expected,}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}**\ actual,}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_UINT32\ num\_elements,}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber,}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_FLAGS\_T\ flags);}
+\DoxyCodeLine{00503\ }
+\DoxyCodeLine{00504\ \textcolor{keywordtype}{void}\ UnityAssertEqualMemory(\ UNITY\_INTERNAL\_PTR\ expected,}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_INTERNAL\_PTR\ actual,}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_UINT32\ length,}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_UINT32\ num\_elements,}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber,}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_FLAGS\_T\ flags);}
+\DoxyCodeLine{00511\ }
+\DoxyCodeLine{00512\ \textcolor{keywordtype}{void}\ UnityAssertNumbersWithin(\textcolor{keyword}{const}\ UNITY\_UINT\ delta,}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_INT\ expected,}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_INT\ actual,}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber,}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_DISPLAY\_STYLE\_T\ style);}
+\DoxyCodeLine{00518\ }
+\DoxyCodeLine{00519\ \textcolor{keywordtype}{void}\ UnityFail(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ message,\ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ line);}
+\DoxyCodeLine{00520\ }
+\DoxyCodeLine{00521\ \textcolor{keywordtype}{void}\ UnityIgnore(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ message,\ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ line);}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00523\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_FLOAT}}
+\DoxyCodeLine{00524\ \textcolor{keywordtype}{void}\ UnityAssertFloatsWithin(\textcolor{keyword}{const}\ UNITY\_FLOAT\ delta,}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_FLOAT\ expected,}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_FLOAT\ actual,}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber);}
+\DoxyCodeLine{00529\ }
+\DoxyCodeLine{00530\ \textcolor{keywordtype}{void}\ UnityAssertEqualFloatArray(UNITY\_PTR\_ATTRIBUTE\ \textcolor{keyword}{const}\ UNITY\_FLOAT*\ expected,}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_PTR\_ATTRIBUTE\ \textcolor{keyword}{const}\ UNITY\_FLOAT*\ actual,}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_UINT32\ num\_elements,}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber,}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_FLAGS\_T\ flags);}
+\DoxyCodeLine{00536\ }
+\DoxyCodeLine{00537\ \textcolor{keywordtype}{void}\ UnityAssertFloatSpecial(\textcolor{keyword}{const}\ UNITY\_FLOAT\ actual,}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber,}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_FLOAT\_TRAIT\_T\ style);}
+\DoxyCodeLine{00541\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00542\ }
+\DoxyCodeLine{00543\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_DOUBLE}}
+\DoxyCodeLine{00544\ \textcolor{keywordtype}{void}\ UnityAssertDoublesWithin(\textcolor{keyword}{const}\ UNITY\_DOUBLE\ delta,}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_DOUBLE\ expected,}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_DOUBLE\ actual,}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber);}
+\DoxyCodeLine{00549\ }
+\DoxyCodeLine{00550\ \textcolor{keywordtype}{void}\ UnityAssertEqualDoubleArray(UNITY\_PTR\_ATTRIBUTE\ \textcolor{keyword}{const}\ UNITY\_DOUBLE*\ expected,}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_PTR\_ATTRIBUTE\ \textcolor{keyword}{const}\ UNITY\_DOUBLE*\ actual,}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_UINT32\ num\_elements,}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber,}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_FLAGS\_T\ flags);}
+\DoxyCodeLine{00556\ }
+\DoxyCodeLine{00557\ \textcolor{keywordtype}{void}\ UnityAssertDoubleSpecial(\textcolor{keyword}{const}\ UNITY\_DOUBLE\ actual,}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg,}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_LINE\_TYPE\ lineNumber,}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UNITY\_FLOAT\_TRAIT\_T\ style);}
+\DoxyCodeLine{00561\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00562\ }
+\DoxyCodeLine{00563\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00564\ \textcolor{comment}{\ *\ Helpers}}
+\DoxyCodeLine{00565\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00566\ }
+\DoxyCodeLine{00567\ UNITY\_INTERNAL\_PTR\ UnityNumToPtr(\textcolor{keyword}{const}\ UNITY\_INT\ num,\ \textcolor{keyword}{const}\ UNITY\_UINT8\ size);}
+\DoxyCodeLine{00568\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_FLOAT}}
+\DoxyCodeLine{00569\ UNITY\_INTERNAL\_PTR\ UnityFloatToPtr(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ num);}
+\DoxyCodeLine{00570\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00571\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_DOUBLE}}
+\DoxyCodeLine{00572\ UNITY\_INTERNAL\_PTR\ UnityDoubleToPtr(\textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ num);}
+\DoxyCodeLine{00573\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00574\ }
+\DoxyCodeLine{00575\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00576\ \textcolor{comment}{\ *\ Error\ Strings\ We\ Might\ Need}}
+\DoxyCodeLine{00577\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00578\ }
+\DoxyCodeLine{00579\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ UnityStrErrFloat[];}
+\DoxyCodeLine{00580\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ UnityStrErrDouble[];}
+\DoxyCodeLine{00581\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ UnityStrErr64[];}
+\DoxyCodeLine{00582\ }
+\DoxyCodeLine{00583\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00584\ \textcolor{comment}{\ *\ Test\ Running\ Macros}}
+\DoxyCodeLine{00585\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00586\ }
+\DoxyCodeLine{00587\ \textcolor{preprocessor}{\#ifndef\ UNITY\_EXCLUDE\_SETJMP\_H}}
+\DoxyCodeLine{00588\ \textcolor{preprocessor}{\#define\ TEST\_PROTECT()\ (setjmp(Unity.AbortFrame)\ ==\ 0)}}
+\DoxyCodeLine{00589\ \textcolor{preprocessor}{\#define\ TEST\_ABORT()\ longjmp(Unity.AbortFrame,\ 1)}}
+\DoxyCodeLine{00590\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00591\ \textcolor{preprocessor}{\#define\ TEST\_PROTECT()\ 1}}
+\DoxyCodeLine{00592\ \textcolor{preprocessor}{\#define\ TEST\_ABORT()\ return}}
+\DoxyCodeLine{00593\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00594\ }
+\DoxyCodeLine{00595\ \textcolor{comment}{/*\ This\ tricky\ series\ of\ macros\ gives\ us\ an\ optional\ line\ argument\ to\ treat\ it\ as\ RUN\_TEST(func,\ num=\_\_LINE\_\_)\ */}}
+\DoxyCodeLine{00596\ \textcolor{preprocessor}{\#ifndef\ RUN\_TEST}}
+\DoxyCodeLine{00597\ \textcolor{preprocessor}{\#ifdef\ \_\_STDC\_VERSION\_\_}}
+\DoxyCodeLine{00598\ \textcolor{preprocessor}{\#if\ \_\_STDC\_VERSION\_\_\ >=\ 199901L}}
+\DoxyCodeLine{00599\ \textcolor{preprocessor}{\#define\ RUN\_TEST(...)\ UnityDefaultTestRun(RUN\_TEST\_FIRST(\_\_VA\_ARGS\_\_),\ RUN\_TEST\_SECOND(\_\_VA\_ARGS\_\_))}}
+\DoxyCodeLine{00600\ \textcolor{preprocessor}{\#define\ RUN\_TEST\_FIRST(...)\ RUN\_TEST\_FIRST\_HELPER(\_\_VA\_ARGS\_\_,\ throwaway)}}
+\DoxyCodeLine{00601\ \textcolor{preprocessor}{\#define\ RUN\_TEST\_FIRST\_HELPER(first,\ ...)\ (first),\ \#first}}
+\DoxyCodeLine{00602\ \textcolor{preprocessor}{\#define\ RUN\_TEST\_SECOND(...)\ RUN\_TEST\_SECOND\_HELPER(\_\_VA\_ARGS\_\_,\ \_\_LINE\_\_,\ throwaway)}}
+\DoxyCodeLine{00603\ \textcolor{preprocessor}{\#define\ RUN\_TEST\_SECOND\_HELPER(first,\ second,\ ...)\ (second)}}
+\DoxyCodeLine{00604\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00605\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00606\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00607\ }
+\DoxyCodeLine{00608\ \textcolor{comment}{/*\ If\ we\ can't\ do\ the\ tricky\ version,\ we'll\ just\ have\ to\ require\ them\ to\ always\ include\ the\ line\ number\ */}}
+\DoxyCodeLine{00609\ \textcolor{preprocessor}{\#ifndef\ RUN\_TEST}}
+\DoxyCodeLine{00610\ \textcolor{preprocessor}{\#ifdef\ CMOCK}}
+\DoxyCodeLine{00611\ \textcolor{preprocessor}{\#define\ RUN\_TEST(func,\ num)\ UnityDefaultTestRun(func,\ \#func,\ num)}}
+\DoxyCodeLine{00612\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00613\ \textcolor{preprocessor}{\#define\ RUN\_TEST(func)\ UnityDefaultTestRun(func,\ \#func,\ \_\_LINE\_\_)}}
+\DoxyCodeLine{00614\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00615\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00616\ }
+\DoxyCodeLine{00617\ \textcolor{preprocessor}{\#define\ TEST\_LINE\_NUM\ (Unity.CurrentTestLineNumber)}}
+\DoxyCodeLine{00618\ \textcolor{preprocessor}{\#define\ TEST\_IS\_IGNORED\ (Unity.CurrentTestIgnored)}}
+\DoxyCodeLine{00619\ \textcolor{preprocessor}{\#define\ UNITY\_NEW\_TEST(a)\ \(\backslash\)}}
+\DoxyCodeLine{00620\ \textcolor{preprocessor}{\ \ \ \ Unity.CurrentTestName\ =\ (a);\ \(\backslash\)}}
+\DoxyCodeLine{00621\ \textcolor{preprocessor}{\ \ \ \ Unity.CurrentTestLineNumber\ =\ (UNITY\_LINE\_TYPE)(\_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{00622\ \textcolor{preprocessor}{\ \ \ \ Unity.NumberOfTests++;}}
+\DoxyCodeLine{00623\ }
+\DoxyCodeLine{00624\ \textcolor{preprocessor}{\#ifndef\ UNITY\_BEGIN}}
+\DoxyCodeLine{00625\ \textcolor{preprocessor}{\#define\ UNITY\_BEGIN()\ UnityBegin(\_\_FILE\_\_)}}
+\DoxyCodeLine{00626\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00627\ }
+\DoxyCodeLine{00628\ \textcolor{preprocessor}{\#ifndef\ UNITY\_END}}
+\DoxyCodeLine{00629\ \textcolor{preprocessor}{\#define\ UNITY\_END()\ UnityEnd()}}
+\DoxyCodeLine{00630\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00631\ }
+\DoxyCodeLine{00632\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00633\ \textcolor{comment}{\ *\ Command\ Line\ Argument\ Support}}
+\DoxyCodeLine{00634\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00635\ }
+\DoxyCodeLine{00636\ \textcolor{preprocessor}{\#ifdef\ UNITY\_USE\_COMMAND\_LINE\_ARGS}}
+\DoxyCodeLine{00637\ \textcolor{keywordtype}{int}\ UnityParseOptions(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ argv);}
+\DoxyCodeLine{00638\ \textcolor{keywordtype}{int}\ UnityTestMatches(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00639\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00640\ }
+\DoxyCodeLine{00641\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00642\ \textcolor{comment}{\ *\ Basic\ Fail\ and\ Ignore}}
+\DoxyCodeLine{00643\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00644\ }
+\DoxyCodeLine{00645\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_FAIL(line,\ message)\ \ \ UnityFail(\ \ \ (message),\ (UNITY\_LINE\_TYPE)(line))}}
+\DoxyCodeLine{00646\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_IGNORE(line,\ message)\ UnityIgnore(\ (message),\ (UNITY\_LINE\_TYPE)(line))}}
+\DoxyCodeLine{00647\ }
+\DoxyCodeLine{00648\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00649\ \textcolor{comment}{\ *\ Test\ Asserts}}
+\DoxyCodeLine{00650\ \textcolor{comment}{\ *-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00651\ }
+\DoxyCodeLine{00652\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT(condition,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (condition)\ \{\}\ else\ \{UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ (message));\}}}
+\DoxyCodeLine{00653\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_NULL(pointer,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_ASSERT(((pointer)\ ==\ NULL),\ \ (UNITY\_LINE\_TYPE)(line),\ (message))}}
+\DoxyCodeLine{00654\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_NOT\_NULL(pointer,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_ASSERT(((pointer)\ !=\ NULL),\ \ (UNITY\_LINE\_TYPE)(line),\ (message))}}
+\DoxyCodeLine{00655\ }
+\DoxyCodeLine{00656\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_INT(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(expected),\ (UNITY\_INT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT)}}
+\DoxyCodeLine{00657\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_INT8(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(UNITY\_INT8\ )(expected),\ (UNITY\_INT)(UNITY\_INT8\ )(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT8)}}
+\DoxyCodeLine{00658\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_INT16(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(UNITY\_INT16)(expected),\ (UNITY\_INT)(UNITY\_INT16)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT16)}}
+\DoxyCodeLine{00659\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_INT32(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(UNITY\_INT32)(expected),\ (UNITY\_INT)(UNITY\_INT32)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT32)}}
+\DoxyCodeLine{00660\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_UINT(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(expected),\ (UNITY\_INT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT)}}
+\DoxyCodeLine{00661\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_UINT8(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(UNITY\_UINT8\ )(expected),\ (UNITY\_INT)(UNITY\_UINT8\ )(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT8)}}
+\DoxyCodeLine{00662\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_UINT16(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(UNITY\_UINT16)(expected),\ (UNITY\_INT)(UNITY\_UINT16)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT16)}}
+\DoxyCodeLine{00663\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_UINT32(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(UNITY\_UINT32)(expected),\ (UNITY\_INT)(UNITY\_UINT32)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT32)}}
+\DoxyCodeLine{00664\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_HEX8(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(UNITY\_INT8\ )(expected),\ (UNITY\_INT)(UNITY\_INT8\ )(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX8)}}
+\DoxyCodeLine{00665\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_HEX16(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(UNITY\_INT16)(expected),\ (UNITY\_INT)(UNITY\_INT16)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX16)}}
+\DoxyCodeLine{00666\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_HEX32(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(UNITY\_INT32)(expected),\ (UNITY\_INT)(UNITY\_INT32)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX32)}}
+\DoxyCodeLine{00667\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_BITS(mask,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertBits((UNITY\_INT)(mask),\ (UNITY\_INT)(expected),\ (UNITY\_INT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line))}}
+\DoxyCodeLine{00668\ }
+\DoxyCodeLine{00669\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_INT(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ \ \ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INT)(actual),\ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_GREATER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT)}}
+\DoxyCodeLine{00670\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_INT8(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_INT8\ )(threshold),\ (UNITY\_INT)(UNITY\_INT8\ )(actual),\ UNITY\_GREATER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT8)}}
+\DoxyCodeLine{00671\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_INT16(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_INT16)(threshold),\ (UNITY\_INT)(UNITY\_INT16)(actual),\ UNITY\_GREATER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT16)}}
+\DoxyCodeLine{00672\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_INT32(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_INT32)(threshold),\ (UNITY\_INT)(UNITY\_INT32)(actual),\ UNITY\_GREATER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT32)}}
+\DoxyCodeLine{00673\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_UINT(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ \ \ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INT)(actual),\ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_GREATER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT)}}
+\DoxyCodeLine{00674\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_UINT8(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT8\ )(threshold),\ (UNITY\_INT)(UNITY\_UINT8\ )(actual),\ UNITY\_GREATER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT8)}}
+\DoxyCodeLine{00675\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_UINT16(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT16)(threshold),\ (UNITY\_INT)(UNITY\_UINT16)(actual),\ UNITY\_GREATER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT16)}}
+\DoxyCodeLine{00676\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_UINT32(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT32)(threshold),\ (UNITY\_INT)(UNITY\_UINT32)(actual),\ UNITY\_GREATER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT32)}}
+\DoxyCodeLine{00677\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_HEX8(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT8\ )(threshold),\ (UNITY\_INT)(UNITY\_UINT8\ )(actual),\ UNITY\_GREATER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX8)}}
+\DoxyCodeLine{00678\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_HEX16(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT16)(threshold),\ (UNITY\_INT)(UNITY\_UINT16)(actual),\ UNITY\_GREATER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX16)}}
+\DoxyCodeLine{00679\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_HEX32(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT32)(threshold),\ (UNITY\_INT)(UNITY\_UINT32)(actual),\ UNITY\_GREATER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX32)}}
+\DoxyCodeLine{00680\ }
+\DoxyCodeLine{00681\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_INT(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ \ \ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INT)(actual),\ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_SMALLER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT)}}
+\DoxyCodeLine{00682\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_INT8(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_INT8\ )(threshold),\ (UNITY\_INT)(UNITY\_INT8\ )(actual),\ UNITY\_SMALLER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT8)}}
+\DoxyCodeLine{00683\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_INT16(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_INT16)(threshold),\ (UNITY\_INT)(UNITY\_INT16)(actual),\ UNITY\_SMALLER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT16)}}
+\DoxyCodeLine{00684\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_INT32(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_INT32)(threshold),\ (UNITY\_INT)(UNITY\_INT32)(actual),\ UNITY\_SMALLER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT32)}}
+\DoxyCodeLine{00685\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_UINT(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ \ \ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INT)(actual),\ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_SMALLER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT)}}
+\DoxyCodeLine{00686\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_UINT8(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT8\ )(threshold),\ (UNITY\_INT)(UNITY\_UINT8\ )(actual),\ UNITY\_SMALLER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT8)}}
+\DoxyCodeLine{00687\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_UINT16(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT16)(threshold),\ (UNITY\_INT)(UNITY\_UINT16)(actual),\ UNITY\_SMALLER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT16)}}
+\DoxyCodeLine{00688\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_UINT32(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT32)(threshold),\ (UNITY\_INT)(UNITY\_UINT32)(actual),\ UNITY\_SMALLER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT32)}}
+\DoxyCodeLine{00689\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_HEX8(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT8\ )(threshold),\ (UNITY\_INT)(UNITY\_UINT8\ )(actual),\ UNITY\_SMALLER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX8)}}
+\DoxyCodeLine{00690\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_HEX16(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT16)(threshold),\ (UNITY\_INT)(UNITY\_UINT16)(actual),\ UNITY\_SMALLER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX16)}}
+\DoxyCodeLine{00691\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_HEX32(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT32)(threshold),\ (UNITY\_INT)(UNITY\_UINT32)(actual),\ UNITY\_SMALLER\_THAN,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX32)}}
+\DoxyCodeLine{00692\ }
+\DoxyCodeLine{00693\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_INT(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ \ \ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INT)(actual),\ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT)}}
+\DoxyCodeLine{00694\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_INT8(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_INT8\ )(threshold),\ (UNITY\_INT)(UNITY\_INT8\ )(actual),\ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT8)}}
+\DoxyCodeLine{00695\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_INT16(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_INT16)(threshold),\ (UNITY\_INT)(UNITY\_INT16)(actual),\ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT16)}}
+\DoxyCodeLine{00696\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_INT32(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_INT32)(threshold),\ (UNITY\_INT)(UNITY\_INT32)(actual),\ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT32)}}
+\DoxyCodeLine{00697\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_UINT(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ \ \ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INT)(actual),\ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT)}}
+\DoxyCodeLine{00698\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_UINT8(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT8\ )(threshold),\ (UNITY\_INT)(UNITY\_UINT8\ )(actual),\ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT8)}}
+\DoxyCodeLine{00699\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_UINT16(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT16)(threshold),\ (UNITY\_INT)(UNITY\_UINT16)(actual),\ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT16)}}
+\DoxyCodeLine{00700\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_UINT32(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT32)(threshold),\ (UNITY\_INT)(UNITY\_UINT32)(actual),\ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT32)}}
+\DoxyCodeLine{00701\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_HEX8(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT8\ )(threshold),\ (UNITY\_INT)(UNITY\_UINT8\ )(actual),\ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX8)}}
+\DoxyCodeLine{00702\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_HEX16(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT16)(threshold),\ (UNITY\_INT)(UNITY\_UINT16)(actual),\ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX16)}}
+\DoxyCodeLine{00703\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_HEX32(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT32)(threshold),\ (UNITY\_INT)(UNITY\_UINT32)(actual),\ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX32)}}
+\DoxyCodeLine{00704\ }
+\DoxyCodeLine{00705\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_INT(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ \ \ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INT)(actual),\ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT)}}
+\DoxyCodeLine{00706\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_INT8(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_INT8\ )(threshold),\ (UNITY\_INT)(UNITY\_INT8\ )(actual),\ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT8)}}
+\DoxyCodeLine{00707\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_INT16(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_INT16)(threshold),\ (UNITY\_INT)(UNITY\_INT16)(actual),\ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT16)}}
+\DoxyCodeLine{00708\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_INT32(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_INT32)(threshold),\ (UNITY\_INT)(UNITY\_INT32)(actual),\ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT32)}}
+\DoxyCodeLine{00709\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_UINT(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ \ \ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INT)(actual),\ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT)}}
+\DoxyCodeLine{00710\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_UINT8(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT8\ )(threshold),\ (UNITY\_INT)(UNITY\_UINT8\ )(actual),\ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT8)}}
+\DoxyCodeLine{00711\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_UINT16(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT16)(threshold),\ (UNITY\_INT)(UNITY\_UINT16)(actual),\ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT16)}}
+\DoxyCodeLine{00712\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_UINT32(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT32)(threshold),\ (UNITY\_INT)(UNITY\_UINT32)(actual),\ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT32)}}
+\DoxyCodeLine{00713\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_HEX8(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT8\ )(threshold),\ (UNITY\_INT)(UNITY\_UINT8\ )(actual),\ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX8)}}
+\DoxyCodeLine{00714\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_HEX16(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT16)(threshold),\ (UNITY\_INT)(UNITY\_UINT16)(actual),\ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX16)}}
+\DoxyCodeLine{00715\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_HEX32(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(UNITY\_UINT32)(threshold),\ (UNITY\_INT)(UNITY\_UINT32)(actual),\ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX32)}}
+\DoxyCodeLine{00716\ }
+\DoxyCodeLine{00717\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_INT\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((delta),\ (UNITY\_INT)(expected),\ (UNITY\_INT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT)}}
+\DoxyCodeLine{00718\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_INT8\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((UNITY\_UINT8\ )(delta),\ (UNITY\_INT)(UNITY\_INT8\ )(expected),\ (UNITY\_INT)(UNITY\_INT8\ )(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT8)}}
+\DoxyCodeLine{00719\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_INT16\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((UNITY\_UINT16)(delta),\ (UNITY\_INT)(UNITY\_INT16)(expected),\ (UNITY\_INT)(UNITY\_INT16)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT16)}}
+\DoxyCodeLine{00720\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_INT32\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((UNITY\_UINT32)(delta),\ (UNITY\_INT)(UNITY\_INT32)(expected),\ (UNITY\_INT)(UNITY\_INT32)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT32)}}
+\DoxyCodeLine{00721\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_UINT\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((delta),\ (UNITY\_INT)(expected),\ (UNITY\_INT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT)}}
+\DoxyCodeLine{00722\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_UINT8\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((UNITY\_UINT8\ )(delta),\ (UNITY\_INT)(UNITY\_UINT)(UNITY\_UINT8\ )(expected),\ (UNITY\_INT)(UNITY\_UINT)(UNITY\_UINT8\ )(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT8)}}
+\DoxyCodeLine{00723\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_UINT16\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((UNITY\_UINT16)(delta),\ (UNITY\_INT)(UNITY\_UINT)(UNITY\_UINT16)(expected),\ (UNITY\_INT)(UNITY\_UINT)(UNITY\_UINT16)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT16)}}
+\DoxyCodeLine{00724\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_UINT32\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((UNITY\_UINT32)(delta),\ (UNITY\_INT)(UNITY\_UINT)(UNITY\_UINT32)(expected),\ (UNITY\_INT)(UNITY\_UINT)(UNITY\_UINT32)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT32)}}
+\DoxyCodeLine{00725\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_HEX8\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((UNITY\_UINT8\ )(delta),\ (UNITY\_INT)(UNITY\_UINT)(UNITY\_UINT8\ )(expected),\ (UNITY\_INT)(UNITY\_UINT)(UNITY\_UINT8\ )(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX8)}}
+\DoxyCodeLine{00726\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_HEX16\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((UNITY\_UINT16)(delta),\ (UNITY\_INT)(UNITY\_UINT)(UNITY\_UINT16)(expected),\ (UNITY\_INT)(UNITY\_UINT)(UNITY\_UINT16)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX16)}}
+\DoxyCodeLine{00727\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_HEX32\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((UNITY\_UINT32)(delta),\ (UNITY\_INT)(UNITY\_UINT)(UNITY\_UINT32)(expected),\ (UNITY\_INT)(UNITY\_UINT)(UNITY\_UINT32)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX32)}}
+\DoxyCodeLine{00728\ }
+\DoxyCodeLine{00729\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_PTR(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_PTR\_TO\_INT)(expected),\ (UNITY\_PTR\_TO\_INT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_POINTER)}}
+\DoxyCodeLine{00730\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_STRING(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualString((const\ char*)(expected),\ (const\ char*)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line))}}
+\DoxyCodeLine{00731\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_STRING\_LEN(expected,\ actual,\ len,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualStringLen((const\ char*)(expected),\ (const\ char*)(actual),\ (UNITY\_UINT32)(len),\ (message),\ (UNITY\_LINE\_TYPE)(line))}}
+\DoxyCodeLine{00732\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_MEMORY(expected,\ actual,\ len,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualMemory((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(len),\ 1,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00733\ }
+\DoxyCodeLine{00734\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_INT\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT,\ \ \ \ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00735\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_INT8\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT8,\ \ \ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00736\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_INT16\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT16,\ \ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00737\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_INT32\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT32,\ \ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00738\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_UINT\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT,\ \ \ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00739\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_UINT8\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT8,\ \ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00740\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_UINT16\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT16,\ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00741\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_UINT32\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT32,\ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00742\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_HEX8\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX8,\ \ \ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00743\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_HEX16\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX16,\ \ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00744\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_HEX32\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX32,\ \ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00745\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_PTR\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_POINTER,\ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00746\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_STRING\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ UnityAssertEqualStringArray((UNITY\_INTERNAL\_PTR)(expected),\ (const\ char**)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00747\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_MEMORY\_ARRAY(expected,\ actual,\ len,\ num\_elements,\ line,\ message)\ UnityAssertEqualMemory((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(len),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00748\ }
+\DoxyCodeLine{00749\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_INT(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)\ \ \ \ \ \ \ \ \ \ \ \ \ \ expected,\ sizeof(int)),\ \ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT,\ \ \ \ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00750\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_INT8(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)(UNITY\_INT8\ \ )expected,\ 1),\ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT8,\ \ \ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00751\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_INT16(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)(UNITY\_INT16\ )expected,\ 2),\ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT16,\ \ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00752\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_INT32(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)(UNITY\_INT32\ )expected,\ 4),\ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT32,\ \ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00753\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_UINT(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)\ \ \ \ \ \ \ \ \ \ \ \ \ \ expected,\ sizeof(unsigned\ int)),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT,\ \ \ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00754\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_UINT8(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)(UNITY\_UINT8\ )expected,\ 1),\ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT8,\ \ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00755\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_UINT16(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)(UNITY\_UINT16)expected,\ 2),\ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT16,\ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00756\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_UINT32(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)(UNITY\_UINT32)expected,\ 4),\ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT32,\ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00757\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_HEX8(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)(UNITY\_INT8\ \ )expected,\ 1),\ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX8,\ \ \ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00758\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_HEX16(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)(UNITY\_INT16\ )expected,\ 2),\ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX16,\ \ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00759\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_HEX32(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)(UNITY\_INT32\ )expected,\ 4),\ \ \ \ \ \ \ \ \ \ \ \ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX32,\ \ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00760\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_PTR(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_PTR\_TO\_INT)\ \ \ \ \ \ \ expected,\ sizeof(int*)),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_POINTER,\ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00761\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_STRING(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualStringArray((UNITY\_INTERNAL\_PTR)(expected),\ (const\ char**)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00762\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_MEMORY(expected,\ actual,\ len,\ num\_elements,\ line,\ message)\ \ UnityAssertEqualMemory((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(len),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00763\ }
+\DoxyCodeLine{00764\ \textcolor{preprocessor}{\#ifdef\ UNITY\_SUPPORT\_64}}
+\DoxyCodeLine{00765\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_INT64(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(expected),\ (UNITY\_INT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT64)}}
+\DoxyCodeLine{00766\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_UINT64(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(expected),\ (UNITY\_INT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT64)}}
+\DoxyCodeLine{00767\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_HEX64(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertEqualNumber((UNITY\_INT)(expected),\ (UNITY\_INT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX64)}}
+\DoxyCodeLine{00768\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_INT64\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT64,\ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00769\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_UINT64\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT64,\ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00770\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_HEX64\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualIntArray((UNITY\_INTERNAL\_PTR)(expected),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX64,\ \ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00771\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_INT64(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)(UNITY\_INT64)expected,\ 8),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT64,\ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00772\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_UINT64(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)(UNITY\_UINT64)expected,\ 8),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT64,\ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00773\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_HEX64(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ UnityAssertEqualIntArray(UnityNumToPtr((UNITY\_INT)(UNITY\_INT64)expected,\ 8),\ (UNITY\_INTERNAL\_PTR)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX64,\ \ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00774\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_INT64\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((delta),\ (UNITY\_INT)(expected),\ (UNITY\_INT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT64)}}
+\DoxyCodeLine{00775\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_UINT64\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((delta),\ (UNITY\_INT)(expected),\ (UNITY\_INT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT64)}}
+\DoxyCodeLine{00776\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_HEX64\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertNumbersWithin((delta),\ (UNITY\_INT)(expected),\ (UNITY\_INT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX64)}}
+\DoxyCodeLine{00777\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_INT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ (UNITY\_INT)(actual),\ UNITY\_GREATER\_THAN,\ \ \ \ \ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT64)}}
+\DoxyCodeLine{00778\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_UINT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ (UNITY\_INT)(actual),\ UNITY\_GREATER\_THAN,\ \ \ \ \ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT64)}}
+\DoxyCodeLine{00779\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_HEX64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ (UNITY\_INT)(actual),\ UNITY\_GREATER\_THAN,\ \ \ \ \ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX64)}}
+\DoxyCodeLine{00780\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_INT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ (UNITY\_INT)(actual),\ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT64)}}
+\DoxyCodeLine{00781\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_UINT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ (UNITY\_INT)(actual),\ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT64)}}
+\DoxyCodeLine{00782\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_HEX64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ (UNITY\_INT)(actual),\ UNITY\_GREATER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX64)}}
+\DoxyCodeLine{00783\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_INT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ (UNITY\_INT)(actual),\ UNITY\_SMALLER\_THAN,\ \ \ \ \ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT64)}}
+\DoxyCodeLine{00784\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_UINT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ (UNITY\_INT)(actual),\ UNITY\_SMALLER\_THAN,\ \ \ \ \ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT64)}}
+\DoxyCodeLine{00785\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_HEX64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ (UNITY\_INT)(actual),\ UNITY\_SMALLER\_THAN,\ \ \ \ \ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX64)}}
+\DoxyCodeLine{00786\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_INT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ (UNITY\_INT)(actual),\ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_INT64)}}
+\DoxyCodeLine{00787\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_UINT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ (UNITY\_INT)(actual),\ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_UINT64)}}
+\DoxyCodeLine{00788\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_HEX64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertGreaterOrLessOrEqualNumber((UNITY\_INT)(threshold),\ (UNITY\_INT)(actual),\ UNITY\_SMALLER\_OR\_EQUAL,\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_DISPLAY\_STYLE\_HEX64)}}
+\DoxyCodeLine{00789\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00790\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_INT64(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00791\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_UINT64(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00792\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_HEX64(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00793\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_INT64\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00794\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_UINT64\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00795\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_HEX64\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00796\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_INT64\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00797\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_UINT64\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00798\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_HEX64\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00799\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_INT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00800\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_UINT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00801\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_THAN\_HEX64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00802\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_INT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00803\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_UINT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00804\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_GREATER\_OR\_EQUAL\_HEX64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00805\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_INT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00806\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_UINT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00807\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_THAN\_HEX64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00808\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_INT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00809\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_UINT64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00810\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_SMALLER\_OR\_EQUAL\_HEX64(threshold,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErr64)}}
+\DoxyCodeLine{00811\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00812\ }
+\DoxyCodeLine{00813\ \textcolor{preprocessor}{\#ifdef\ UNITY\_EXCLUDE\_FLOAT}}
+\DoxyCodeLine{00814\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrFloat)}}
+\DoxyCodeLine{00815\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_FLOAT(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrFloat)}}
+\DoxyCodeLine{00816\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_FLOAT\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrFloat)}}
+\DoxyCodeLine{00817\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_FLOAT(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrFloat)}}
+\DoxyCodeLine{00818\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrFloat)}}
+\DoxyCodeLine{00819\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_NEG\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrFloat)}}
+\DoxyCodeLine{00820\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_NAN(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrFloat)}}
+\DoxyCodeLine{00821\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_DETERMINATE(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrFloat)}}
+\DoxyCodeLine{00822\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_NOT\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrFloat)}}
+\DoxyCodeLine{00823\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_NOT\_NEG\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrFloat)}}
+\DoxyCodeLine{00824\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_NOT\_NAN(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrFloat)}}
+\DoxyCodeLine{00825\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_NOT\_DETERMINATE(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrFloat)}}
+\DoxyCodeLine{00826\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00827\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertFloatsWithin((UNITY\_FLOAT)(delta),\ (UNITY\_FLOAT)(expected),\ (UNITY\_FLOAT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line))}}
+\DoxyCodeLine{00828\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_FLOAT(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_ASSERT\_FLOAT\_WITHIN((UNITY\_FLOAT)(expected)\ *\ (UNITY\_FLOAT)UNITY\_FLOAT\_PRECISION,\ (UNITY\_FLOAT)(expected),\ (UNITY\_FLOAT)(actual),\ (UNITY\_LINE\_TYPE)(line),\ (message))}}
+\DoxyCodeLine{00829\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_FLOAT\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualFloatArray((UNITY\_FLOAT*)(expected),\ (UNITY\_FLOAT*)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00830\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_FLOAT(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ \ UnityAssertEqualFloatArray(UnityFloatToPtr(expected),\ (UNITY\_FLOAT*)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00831\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertFloatSpecial((UNITY\_FLOAT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_INF)}}
+\DoxyCodeLine{00832\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_NEG\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertFloatSpecial((UNITY\_FLOAT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_NEG\_INF)}}
+\DoxyCodeLine{00833\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_NAN(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertFloatSpecial((UNITY\_FLOAT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_NAN)}}
+\DoxyCodeLine{00834\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_DETERMINATE(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertFloatSpecial((UNITY\_FLOAT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_DET)}}
+\DoxyCodeLine{00835\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_NOT\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertFloatSpecial((UNITY\_FLOAT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_NOT\_INF)}}
+\DoxyCodeLine{00836\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_NOT\_NEG\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertFloatSpecial((UNITY\_FLOAT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_NOT\_NEG\_INF)}}
+\DoxyCodeLine{00837\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_NOT\_NAN(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertFloatSpecial((UNITY\_FLOAT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_NOT\_NAN)}}
+\DoxyCodeLine{00838\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_FLOAT\_IS\_NOT\_DETERMINATE(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertFloatSpecial((UNITY\_FLOAT)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_NOT\_DET)}}
+\DoxyCodeLine{00839\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00840\ }
+\DoxyCodeLine{00841\ \textcolor{preprocessor}{\#ifdef\ UNITY\_EXCLUDE\_DOUBLE}}
+\DoxyCodeLine{00842\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrDouble)}}
+\DoxyCodeLine{00843\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_DOUBLE(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrDouble)}}
+\DoxyCodeLine{00844\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_DOUBLE\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrDouble)}}
+\DoxyCodeLine{00845\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_DOUBLE(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrDouble)}}
+\DoxyCodeLine{00846\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrDouble)}}
+\DoxyCodeLine{00847\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_NEG\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrDouble)}}
+\DoxyCodeLine{00848\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_NAN(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrDouble)}}
+\DoxyCodeLine{00849\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_DETERMINATE(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrDouble)}}
+\DoxyCodeLine{00850\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_NOT\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrDouble)}}
+\DoxyCodeLine{00851\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_NOT\_NEG\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrDouble)}}
+\DoxyCodeLine{00852\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_NOT\_NAN(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrDouble)}}
+\DoxyCodeLine{00853\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_NOT\_DETERMINATE(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_FAIL((UNITY\_LINE\_TYPE)(line),\ UnityStrErrDouble)}}
+\DoxyCodeLine{00854\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00855\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_WITHIN(delta,\ expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertDoublesWithin((UNITY\_DOUBLE)(delta),\ (UNITY\_DOUBLE)(expected),\ (UNITY\_DOUBLE)(actual),\ (message),\ (UNITY\_LINE\_TYPE)line)}}
+\DoxyCodeLine{00856\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_DOUBLE(expected,\ actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNITY\_TEST\_ASSERT\_DOUBLE\_WITHIN((UNITY\_DOUBLE)(expected)\ *\ (UNITY\_DOUBLE)UNITY\_DOUBLE\_PRECISION,\ (UNITY\_DOUBLE)expected,\ (UNITY\_DOUBLE)actual,\ (UNITY\_LINE\_TYPE)(line),\ message)}}
+\DoxyCodeLine{00857\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EQUAL\_DOUBLE\_ARRAY(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ UnityAssertEqualDoubleArray((UNITY\_DOUBLE*)(expected),\ (UNITY\_DOUBLE*)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)line,\ UNITY\_ARRAY\_TO\_ARRAY)}}
+\DoxyCodeLine{00858\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_EACH\_EQUAL\_DOUBLE(expected,\ actual,\ num\_elements,\ line,\ message)\ \ \ \ \ \ \ UnityAssertEqualDoubleArray(UnityDoubleToPtr(expected),\ (UNITY\_DOUBLE*)(actual),\ (UNITY\_UINT32)(num\_elements),\ (message),\ (UNITY\_LINE\_TYPE)line,\ UNITY\_ARRAY\_TO\_VAL)}}
+\DoxyCodeLine{00859\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertDoubleSpecial((UNITY\_DOUBLE)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_INF)}}
+\DoxyCodeLine{00860\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_NEG\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertDoubleSpecial((UNITY\_DOUBLE)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_NEG\_INF)}}
+\DoxyCodeLine{00861\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_NAN(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertDoubleSpecial((UNITY\_DOUBLE)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_NAN)}}
+\DoxyCodeLine{00862\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_DETERMINATE(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertDoubleSpecial((UNITY\_DOUBLE)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_DET)}}
+\DoxyCodeLine{00863\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_NOT\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertDoubleSpecial((UNITY\_DOUBLE)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_NOT\_INF)}}
+\DoxyCodeLine{00864\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_NOT\_NEG\_INF(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertDoubleSpecial((UNITY\_DOUBLE)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_NOT\_NEG\_INF)}}
+\DoxyCodeLine{00865\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_NOT\_NAN(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertDoubleSpecial((UNITY\_DOUBLE)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_NOT\_NAN)}}
+\DoxyCodeLine{00866\ \textcolor{preprocessor}{\#define\ UNITY\_TEST\_ASSERT\_DOUBLE\_IS\_NOT\_DETERMINATE(actual,\ line,\ message)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnityAssertDoubleSpecial((UNITY\_DOUBLE)(actual),\ (message),\ (UNITY\_LINE\_TYPE)(line),\ UNITY\_FLOAT\_IS\_NOT\_DET)}}
+\DoxyCodeLine{00867\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00868\ }
+\DoxyCodeLine{00869\ \textcolor{comment}{/*\ End\ of\ UNITY\_INTERNALS\_H\ */}}
+\DoxyCodeLine{00870\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,552 @@
+\chapter{c\+JSON}
+\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e}{}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e}\index{cJSON@{cJSON}}
+\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md97}%
+\Hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md97}%
+ Ultralightweight JSON parser in ANSI C.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md98}{}\doxysection{\texorpdfstring{Table of contents}{Table of contents}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md98}
+
+\begin{DoxyItemize}
+\item License
+\item Usage
+\begin{DoxyItemize}
+\item Welcome to c\+JSON
+\item Building
+\begin{DoxyItemize}
+\item Copying the source
+\item CMake
+\item Makefile
+\item Meson
+\item Vcpkg
+\end{DoxyItemize}
+\item Including c\+JSON
+\item Data Structure
+\item Working with the data structure
+\begin{DoxyItemize}
+\item Basic types
+\item Arrays
+\item Objects
+\end{DoxyItemize}
+\item Parsing JSON
+\item Printing JSON
+\item Example
+\begin{DoxyItemize}
+\item Printing
+\item Parsing
+\end{DoxyItemize}
+\item Caveats
+\begin{DoxyItemize}
+\item Zero Character
+\item Character Encoding
+\item C Standard
+\item Floating Point Numbers
+\item Deep Nesting Of Arrays And Objects
+\item Thread Safety
+\item Case Sensitivity
+\item Duplicate Object Members
+\end{DoxyItemize}
+\item Enjoy c\+JSON!
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md99}{}\doxysection{\texorpdfstring{License}{License}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md99}
+MIT License
+
+\begin{quote}
+ Copyright (c) 2009-\/2017 Dave Gamble and \doxylink{structc_j_s_o_n}{c\+JSON} contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"{}\+Software\"{}), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions\+:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED \"{}\+AS IS\"{}, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. \end{quote}
+\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md100}{}\doxysection{\texorpdfstring{Usage}{Usage}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md100}
+\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md101}{}\doxysubsection{\texorpdfstring{Welcome to c\+JSON.}{Welcome to cJSON.}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md101}
+\doxylink{structc_j_s_o_n}{c\+JSON} aims to be the dumbest possible parser that you can get your job done with. It\textquotesingle{}s a single file of C, and a single header file.
+
+JSON is described best here\+: \href{http://www.json.org/}{\texttt{ http\+://www.\+json.\+org/}} It\textquotesingle{}s like XML, but fat-\/free. You use it to move data around, store things, or just generally represent your program\textquotesingle{}s state.
+
+As a library, \doxylink{structc_j_s_o_n}{c\+JSON} exists to take away as much legwork as it can, but not get in your way. As a point of pragmatism (i.\+e. ignoring the truth), I\textquotesingle{}m going to say that you can use it in one of two modes\+: Auto and Manual. Let\textquotesingle{}s have a quick run-\/through.
+
+I lifted some JSON from this page\+: \href{http://www.json.org/fatfree.html}{\texttt{ http\+://www.\+json.\+org/fatfree.\+html}} That page inspired me to write \doxylink{structc_j_s_o_n}{c\+JSON}, which is a parser that tries to share the same philosophy as JSON itself. Simple, dumb, out of the way.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md102}{}\doxysubsection{\texorpdfstring{Building}{Building}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md102}
+There are several ways to incorporate \doxylink{structc_j_s_o_n}{c\+JSON} into your project.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md103}{}\doxysubsubsection{\texorpdfstring{copying the source}{copying the source}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md103}
+Because the entire library is only one C file and one header file, you can just copy {\ttfamily \doxylink{c_j_s_o_n_8h_source}{c\+JSON.\+h}} and {\ttfamily \doxylink{c_j_s_o_n_8c_source}{c\+JSON.\+c}} to your projects source and start using it.
+
+\doxylink{structc_j_s_o_n}{c\+JSON} is written in ANSI C (C89) in order to support as many platforms and compilers as possible.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md104}{}\doxysubsubsection{\texorpdfstring{CMake}{CMake}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md104}
+With CMake, \doxylink{structc_j_s_o_n}{c\+JSON} supports a full blown build system. This way you get the most features. CMake with an equal or higher version than 2.\+8.\+5 is supported. With CMake it is recommended to do an out of tree build, meaning the compiled files are put in a directory separate from the source files. So in order to build \doxylink{structc_j_s_o_n}{c\+JSON} with CMake on a Unix platform, make a {\ttfamily build} directory and run CMake inside it.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{mkdir\ build}
+\DoxyCodeLine{cd\ build}
+\DoxyCodeLine{cmake\ ..}
+
+\end{DoxyCode}
+
+
+This will create a Makefile and a bunch of other files. You can then compile it\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make}
+
+\end{DoxyCode}
+
+
+And install it with {\ttfamily make install} if you want. By default it installs the headers {\ttfamily /usr/local/include/cjson} and the libraries to {\ttfamily /usr/local/lib}. It also installs files for pkg-\/config to make it easier to detect and use an existing installation of CMake. And it installs CMake config files, that can be used by other CMake based projects to discover the library.
+
+You can change the build process with a list of different options that you can pass to CMake. Turn them on with {\ttfamily On} and off with {\ttfamily Off}\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily -\/DENABLE\+\_\+\+CJSON\+\_\+\+TEST=On}\+: Enable building the tests. (on by default)
+\item {\ttfamily -\/DENABLE\+\_\+\+CJSON\+\_\+\+UTILS=On}\+: Enable building c\+JSON\+\_\+\+Utils. (off by default)
+\item {\ttfamily -\/DENABLE\+\_\+\+TARGET\+\_\+\+EXPORT=On}\+: Enable the export of CMake targets. Turn off if it makes problems. (on by default)
+\item {\ttfamily -\/DENABLE\+\_\+\+CUSTOM\+\_\+\+COMPILER\+\_\+\+FLAGS=On}\+: Enable custom compiler flags (currently for Clang, GCC and MSVC). Turn off if it makes problems. (on by default)
+\item {\ttfamily -\/DENABLE\+\_\+\+VALGRIND=On}\+: Run tests with \href{http://valgrind.org}{\texttt{ valgrind}}. (off by default)
+\item {\ttfamily -\/DENABLE\+\_\+\+SANITIZERS=On}\+: Compile \doxylink{structc_j_s_o_n}{c\+JSON} with \href{https://github.com/google/sanitizers/wiki/AddressSanitizer}{\texttt{ Address\+Sanitizer}} and \href{https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html}{\texttt{ Undefined\+Behavior\+Sanitizer}} enabled (if possible). (off by default)
+\item {\ttfamily -\/DENABLE\+\_\+\+SAFE\+\_\+\+STACK}\+: Enable the \href{https://clang.llvm.org/docs/SafeStack.html}{\texttt{ Safe\+Stack}} instrumentation pass. Currently only works with the Clang compiler. (off by default)
+\item {\ttfamily -\/DBUILD\+\_\+\+SHARED\+\_\+\+LIBS=On}\+: Build the shared libraries. (on by default)
+\item {\ttfamily -\/DBUILD\+\_\+\+SHARED\+\_\+\+AND\+\_\+\+STATIC\+\_\+\+LIBS=On}\+: Build both shared and static libraries. (off by default)
+\item {\ttfamily -\/DCMAKE\+\_\+\+INSTALL\+\_\+\+PREFIX=/usr}\+: Set a prefix for the installation.
+\item {\ttfamily -\/DENABLE\+\_\+\+LOCALES=On}\+: Enable the usage of localeconv method. ( on by default )
+\item {\ttfamily -\/DCJSON\+\_\+\+OVERRIDE\+\_\+\+BUILD\+\_\+\+SHARED\+\_\+\+LIBS=On}\+: Enable overriding the value of {\ttfamily BUILD\+\_\+\+SHARED\+\_\+\+LIBS} with {\ttfamily -\/DCJSON\+\_\+\+BUILD\+\_\+\+SHARED\+\_\+\+LIBS}.
+\item {\ttfamily -\/DENABLE\+\_\+\+CJSON\+\_\+\+VERSION\+\_\+\+SO}\+: Enable \doxylink{structc_j_s_o_n}{c\+JSON} so version. ( on by default )
+\end{DoxyItemize}
+
+If you are packaging \doxylink{structc_j_s_o_n}{c\+JSON} for a distribution of Linux, you would probably take these steps for example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{mkdir\ build}
+\DoxyCodeLine{cd\ build}
+\DoxyCodeLine{cmake\ ..\ -\/DENABLE\_CJSON\_UTILS=On\ -\/DENABLE\_CJSON\_TEST=Off\ -\/DCMAKE\_INSTALL\_PREFIX=/usr}
+\DoxyCodeLine{make}
+\DoxyCodeLine{make\ DESTDIR=\$pkgdir\ install}
+
+\end{DoxyCode}
+
+
+On Windows CMake is usually used to create a Visual Studio solution file by running it inside the Developer Command Prompt for Visual Studio, for exact steps follow the official documentation from CMake and Microsoft and use the online search engine of your choice. The descriptions of the the options above still generally apply, although not all of them work on Windows.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md105}{}\doxysubsubsection{\texorpdfstring{Makefile}{Makefile}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md105}
+{\bfseries{NOTE\+:}} This Method is deprecated. Use CMake if at all possible. Makefile support is limited to fixing bugs.
+
+If you don\textquotesingle{}t have CMake available, but still have GNU make. You can use the makefile to build \doxylink{structc_j_s_o_n}{c\+JSON}\+:
+
+Run this command in the directory with the source code and it will automatically compile static and shared libraries and a little test program (not the full test suite).
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ all}
+
+\end{DoxyCode}
+
+
+If you want, you can install the compiled library to your system using {\ttfamily make install}. By default it will install the headers in {\ttfamily /usr/local/include/cjson} and the libraries in {\ttfamily /usr/local/lib}. But you can change this behavior by setting the {\ttfamily PREFIX} and {\ttfamily DESTDIR} variables\+: {\ttfamily make PREFIX=/usr DESTDIR=temp install}. And uninstall them with\+: {\ttfamily make PREFIX=/usr DESTDIR=temp uninstall}.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md106}{}\doxysubsubsection{\texorpdfstring{Meson}{Meson}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md106}
+To make cjson work in a project using meson, the libcjson dependency has to be included\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{project('c-\/json-\/example',\ 'c')}
+\DoxyCodeLine{}
+\DoxyCodeLine{cjson\ =\ dependency('libcjson')}
+\DoxyCodeLine{}
+\DoxyCodeLine{example\ =\ executable(}
+\DoxyCodeLine{\ \ \ \ 'example',}
+\DoxyCodeLine{\ \ \ \ 'example.c',}
+\DoxyCodeLine{\ \ \ \ dependencies:\ [cjson],}
+\DoxyCodeLine{)}
+
+\end{DoxyCode}
+\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md107}{}\doxysubsubsection{\texorpdfstring{Vcpkg}{Vcpkg}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md107}
+You can download and install \doxylink{structc_j_s_o_n}{c\+JSON} using the \href{https://github.com/Microsoft/vcpkg}{\texttt{ vcpkg}} dependency manager\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{git\ clone\ https://github.com/Microsoft/vcpkg.git}
+\DoxyCodeLine{cd\ vcpkg}
+\DoxyCodeLine{./bootstrap-\/vcpkg.sh}
+\DoxyCodeLine{./vcpkg\ integrate\ install}
+\DoxyCodeLine{vcpkg\ install\ cjson}
+
+\end{DoxyCode}
+
+
+The \doxylink{structc_j_s_o_n}{c\+JSON} port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please \href{https://github.com/Microsoft/vcpkg}{\texttt{ create an issue or pull request}} on the vcpkg repository.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md108}{}\doxysubsection{\texorpdfstring{Including c\+JSON}{Including cJSON}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md108}
+If you installed it via CMake or the Makefile, you can include \doxylink{structc_j_s_o_n}{c\+JSON} like this\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <cjson/cJSON.h>}}
+
+\end{DoxyCode}
+\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md109}{}\doxysubsection{\texorpdfstring{Data Structure}{Data Structure}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md109}
+\doxylink{structc_j_s_o_n}{c\+JSON} represents JSON data using the {\ttfamily \doxylink{structc_j_s_o_n}{c\+JSON}} struct data type\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{/*\ The\ cJSON\ structure:\ */}}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structc_j_s_o_n}{cJSON}}}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *next;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *prev;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *child;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ type;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{char}\ *valuestring;}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{/*\ writing\ to\ valueint\ is\ DEPRECATED,\ use\ cJSON\_SetNumberValue\ instead\ */}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ valueint;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{double}\ valuedouble;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{char}\ *string;}
+\DoxyCodeLine{\}\ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}};}
+
+\end{DoxyCode}
+
+
+An item of this type represents a JSON value. The type is stored in {\ttfamily type} as a bit-\/flag ({\bfseries{this means that you cannot find out the type by just comparing the value of {\ttfamily type}}}).
+
+To check the type of an item, use the corresponding {\ttfamily c\+JSON\+\_\+\+Is...} function. It does a {\ttfamily NULL} check followed by a type check and returns a boolean value if the item is of this type.
+
+The type can be one of the following\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily c\+JSON\+\_\+\+Invalid} (check with {\ttfamily c\+JSON\+\_\+\+Is\+Invalid})\+: Represents an invalid item that doesn\textquotesingle{}t contain any value. You automatically have this type if you set the item to all zero bytes.
+\item {\ttfamily c\+JSON\+\_\+\+False} (check with {\ttfamily c\+JSON\+\_\+\+Is\+False})\+: Represents a {\ttfamily false} boolean value. You can also check for boolean values in general with {\ttfamily c\+JSON\+\_\+\+Is\+Bool}.
+\item {\ttfamily c\+JSON\+\_\+\+True} (check with {\ttfamily c\+JSON\+\_\+\+Is\+True})\+: Represents a {\ttfamily true} boolean value. You can also check for boolean values in general with {\ttfamily c\+JSON\+\_\+\+Is\+Bool}.
+\item {\ttfamily c\+JSON\+\_\+\+NULL} (check with {\ttfamily c\+JSON\+\_\+\+Is\+Null})\+: Represents a {\ttfamily null} value.
+\item {\ttfamily c\+JSON\+\_\+\+Number} (check with {\ttfamily c\+JSON\+\_\+\+Is\+Number})\+: Represents a number value. The value is stored as a double in {\ttfamily valuedouble} and also in {\ttfamily valueint}. If the number is outside of the range of an integer, {\ttfamily INT\+\_\+\+MAX} or {\ttfamily INT\+\_\+\+MIN} are used for {\ttfamily valueint}.
+\item {\ttfamily c\+JSON\+\_\+\+String} (check with {\ttfamily c\+JSON\+\_\+\+Is\+String})\+: Represents a string value. It is stored in the form of a zero terminated string in {\ttfamily valuestring}.
+\item {\ttfamily c\+JSON\+\_\+\+Array} (check with {\ttfamily c\+JSON\+\_\+\+Is\+Array})\+: Represent an array value. This is implemented by pointing {\ttfamily child} to a linked list of {\ttfamily \doxylink{structc_j_s_o_n}{c\+JSON}} items that represent the values in the array. The elements are linked together using {\ttfamily next} and {\ttfamily prev}, where the first element has {\ttfamily prev.\+next == NULL} and the last element {\ttfamily next == NULL}.
+\item {\ttfamily c\+JSON\+\_\+\+Object} (check with {\ttfamily c\+JSON\+\_\+\+Is\+Object})\+: Represents an object value. Objects are stored same way as an array, the only difference is that the items in the object store their keys in {\ttfamily string}.
+\item {\ttfamily c\+JSON\+\_\+\+Raw} (check with {\ttfamily c\+JSON\+\_\+\+Is\+Raw})\+: Represents any kind of JSON that is stored as a zero terminated array of characters in {\ttfamily valuestring}. This can be used, for example, to avoid printing the same static JSON over and over again to save performance. \doxylink{structc_j_s_o_n}{c\+JSON} will never create this type when parsing. Also note that \doxylink{structc_j_s_o_n}{c\+JSON} doesn\textquotesingle{}t check if it is valid JSON.
+\end{DoxyItemize}
+
+Additionally there are the following two flags\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily c\+JSON\+\_\+\+Is\+Reference}\+: Specifies that the item that {\ttfamily child} points to and/or {\ttfamily valuestring} is not owned by this item, it is only a reference. So {\ttfamily c\+JSON\+\_\+\+Delete} and other functions will only deallocate this item, not its {\ttfamily child}/{\ttfamily valuestring}.
+\item {\ttfamily c\+JSON\+\_\+\+String\+Is\+Const}\+: This means that {\ttfamily string} points to a constant string. This means that {\ttfamily c\+JSON\+\_\+\+Delete} and other functions will not try to deallocate {\ttfamily string}.
+\end{DoxyItemize}\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md110}{}\doxysubsection{\texorpdfstring{Working with the data structure}{Working with the data structure}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md110}
+For every value type there is a {\ttfamily c\+JSON\+\_\+\+Create...} function that can be used to create an item of that type. All of these will allocate a {\ttfamily \doxylink{structc_j_s_o_n}{c\+JSON}} struct that can later be deleted with {\ttfamily c\+JSON\+\_\+\+Delete}. Note that you have to delete them at some point, otherwise you will get a memory leak. ~\newline
+ {\bfseries{Important}}\+: If you have added an item to an array or an object already, you {\bfseries{mustn\textquotesingle{}t}} delete it with {\ttfamily c\+JSON\+\_\+\+Delete}. Adding it to an array or object transfers its ownership so that when that array or object is deleted, it gets deleted as well. You also could use {\ttfamily c\+JSON\+\_\+\+Set\+Valuestring} to change a {\ttfamily c\+JSON\+\_\+\+String}\textquotesingle{}s {\ttfamily valuestring}, and you needn\textquotesingle{}t to free the previous {\ttfamily valuestring} manually.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md111}{}\doxysubsubsection{\texorpdfstring{Basic types}{Basic types}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md111}
+
+\begin{DoxyItemize}
+\item {\bfseries{null}} is created with {\ttfamily c\+JSON\+\_\+\+Create\+Null}
+\item {\bfseries{booleans}} are created with {\ttfamily c\+JSON\+\_\+\+Create\+True}, {\ttfamily c\+JSON\+\_\+\+Create\+False} or {\ttfamily c\+JSON\+\_\+\+Create\+Bool}
+\item {\bfseries{numbers}} are created with {\ttfamily c\+JSON\+\_\+\+Create\+Number}. This will set both {\ttfamily valuedouble} and {\ttfamily valueint}. If the number is outside of the range of an integer, {\ttfamily INT\+\_\+\+MAX} or {\ttfamily INT\+\_\+\+MIN} are used for {\ttfamily valueint}
+\item {\bfseries{strings}} are created with {\ttfamily c\+JSON\+\_\+\+Create\+String} (copies the string) or with {\ttfamily c\+JSON\+\_\+\+Create\+String\+Reference} (directly points to the string. This means that {\ttfamily valuestring} won\textquotesingle{}t be deleted by {\ttfamily c\+JSON\+\_\+\+Delete} and you are responsible for its lifetime, useful for constants)
+\end{DoxyItemize}\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md112}{}\doxysubsubsection{\texorpdfstring{Arrays}{Arrays}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md112}
+You can create an empty array with {\ttfamily c\+JSON\+\_\+\+Create\+Array}. {\ttfamily c\+JSON\+\_\+\+Create\+Array\+Reference} can be used to create an array that doesn\textquotesingle{}t \"{}own\"{} its content, so its content doesn\textquotesingle{}t get deleted by {\ttfamily c\+JSON\+\_\+\+Delete}.
+
+To add items to an array, use {\ttfamily c\+JSON\+\_\+\+Add\+Item\+To\+Array} to append items to the end. Using {\ttfamily c\+JSON\+\_\+\+Add\+Item\+Reference\+To\+Array} an element can be added as a reference to another item, array or string. This means that {\ttfamily c\+JSON\+\_\+\+Delete} will not delete that items {\ttfamily child} or {\ttfamily valuestring} properties, so no double frees are occurring if they are already used elsewhere. To insert items in the middle, use {\ttfamily c\+JSON\+\_\+\+Insert\+Item\+In\+Array}. It will insert an item at the given 0 based index and shift all the existing items to the right.
+
+If you want to take an item out of an array at a given index and continue using it, use {\ttfamily c\+JSON\+\_\+\+Detach\+Item\+From\+Array}, it will return the detached item, so be sure to assign it to a pointer, otherwise you will have a memory leak.
+
+Deleting items is done with {\ttfamily c\+JSON\+\_\+\+Delete\+Item\+From\+Array}. It works like {\ttfamily c\+JSON\+\_\+\+Detach\+Item\+From\+Array}, but deletes the detached item via {\ttfamily c\+JSON\+\_\+\+Delete}.
+
+You can also replace an item in an array in place. Either with {\ttfamily c\+JSON\+\_\+\+Replace\+Item\+In\+Array} using an index or with {\ttfamily c\+JSON\+\_\+\+Replace\+Item\+Via\+Pointer} given a pointer to an element. {\ttfamily c\+JSON\+\_\+\+Replace\+Item\+Via\+Pointer} will return {\ttfamily 0} if it fails. What this does internally is to detach the old item, delete it and insert the new item in its place.
+
+To get the size of an array, use {\ttfamily c\+JSON\+\_\+\+Get\+Array\+Size}. Use {\ttfamily c\+JSON\+\_\+\+Get\+Array\+Item} to get an element at a given index.
+
+Because an array is stored as a linked list, iterating it via index is inefficient ({\ttfamily O(n²)}), so you can iterate over an array using the {\ttfamily c\+JSON\+\_\+\+Array\+For\+Each} macro in {\ttfamily O(n)} time complexity.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md113}{}\doxysubsubsection{\texorpdfstring{Objects}{Objects}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md113}
+You can create an empty object with {\ttfamily c\+JSON\+\_\+\+Create\+Object}. {\ttfamily c\+JSON\+\_\+\+Create\+Object\+Reference} can be used to create an object that doesn\textquotesingle{}t \"{}own\"{} its content, so its content doesn\textquotesingle{}t get deleted by {\ttfamily c\+JSON\+\_\+\+Delete}.
+
+To add items to an object, use {\ttfamily c\+JSON\+\_\+\+Add\+Item\+To\+Object}. Use {\ttfamily c\+JSON\+\_\+\+Add\+Item\+To\+Object\+CS} to add an item to an object with a name that is a constant or reference (key of the item, {\ttfamily string} in the {\ttfamily \doxylink{structc_j_s_o_n}{c\+JSON}} struct), so that it doesn\textquotesingle{}t get freed by {\ttfamily c\+JSON\+\_\+\+Delete}. Using {\ttfamily c\+JSON\+\_\+\+Add\+Item\+Reference\+To\+Array} an element can be added as a reference to another object, array or string. This means that {\ttfamily c\+JSON\+\_\+\+Delete} will not delete that items {\ttfamily child} or {\ttfamily valuestring} properties, so no double frees are occurring if they are already used elsewhere.
+
+If you want to take an item out of an object, use {\ttfamily c\+JSON\+\_\+\+Detach\+Item\+From\+Object\+Case\+Sensitive}, it will return the detached item, so be sure to assign it to a pointer, otherwise you will have a memory leak.
+
+Deleting items is done with {\ttfamily c\+JSON\+\_\+\+Delete\+Item\+From\+Object\+Case\+Sensitive}. It works like {\ttfamily c\+JSON\+\_\+\+Detach\+Item\+From\+Object\+Case\+Sensitive} followed by {\ttfamily c\+JSON\+\_\+\+Delete}.
+
+You can also replace an item in an object in place. Either with {\ttfamily c\+JSON\+\_\+\+Replace\+Item\+In\+Object\+Case\+Sensitive} using a key or with {\ttfamily c\+JSON\+\_\+\+Replace\+Item\+Via\+Pointer} given a pointer to an element. {\ttfamily c\+JSON\+\_\+\+Replace\+Item\+Via\+Pointer} will return {\ttfamily 0} if it fails. What this does internally is to detach the old item, delete it and insert the new item in its place.
+
+To get the size of an object, you can use {\ttfamily c\+JSON\+\_\+\+Get\+Array\+Size}, this works because internally objects are stored as arrays.
+
+If you want to access an item in an object, use {\ttfamily c\+JSON\+\_\+\+Get\+Object\+Item\+Case\+Sensitive}.
+
+To iterate over an object, you can use the {\ttfamily c\+JSON\+\_\+\+Array\+For\+Each} macro the same way as for arrays.
+
+\doxylink{structc_j_s_o_n}{c\+JSON} also provides convenient helper functions for quickly creating a new item and adding it to an object, like {\ttfamily c\+JSON\+\_\+\+Add\+Null\+To\+Object}. They return a pointer to the new item or {\ttfamily NULL} if they failed.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md114}{}\doxysubsection{\texorpdfstring{Parsing JSON}{Parsing JSON}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md114}
+Given some JSON in a zero terminated string, you can parse it with {\ttfamily c\+JSON\+\_\+\+Parse}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *json\ =\ cJSON\_Parse(\textcolor{keywordtype}{string});}
+
+\end{DoxyCode}
+
+
+Given some JSON in a string (whether zero terminated or not), you can parse it with {\ttfamily c\+JSON\+\_\+\+Parse\+With\+Length}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *json\ =\ cJSON\_ParseWithLength(\textcolor{keywordtype}{string},\ buffer\_length);}
+
+\end{DoxyCode}
+
+
+It will parse the JSON and allocate a tree of {\ttfamily \doxylink{structc_j_s_o_n}{c\+JSON}} items that represents it. Once it returns, you are fully responsible for deallocating it after use with {\ttfamily c\+JSON\+\_\+\+Delete}.
+
+The allocator used by {\ttfamily c\+JSON\+\_\+\+Parse} is {\ttfamily malloc} and {\ttfamily free} by default but can be changed (globally) with {\ttfamily c\+JSON\+\_\+\+Init\+Hooks}.
+
+If an error occurs a pointer to the position of the error in the input string can be accessed using {\ttfamily c\+JSON\+\_\+\+Get\+Error\+Ptr}. Note though that this can produce race conditions in multithreading scenarios, in that case it is better to use {\ttfamily c\+JSON\+\_\+\+Parse\+With\+Opts} with {\ttfamily return\+\_\+parse\+\_\+end}. By default, characters in the input string that follow the parsed JSON will not be considered as an error.
+
+If you want more options, use {\ttfamily c\+JSON\+\_\+\+Parse\+With\+Opts(const char \texorpdfstring{$\ast$}{*}value, const char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}return\+\_\+parse\+\_\+end, c\+JSON\+\_\+bool require\+\_\+null\+\_\+terminated)}. {\ttfamily return\+\_\+parse\+\_\+end} returns a pointer to the end of the JSON in the input string or the position that an error occurs at (thereby replacing {\ttfamily c\+JSON\+\_\+\+Get\+Error\+Ptr} in a thread safe way). {\ttfamily require\+\_\+null\+\_\+terminated}, if set to {\ttfamily 1} will make it an error if the input string contains data after the JSON.
+
+If you want more options giving buffer length, use {\ttfamily c\+JSON\+\_\+\+Parse\+With\+Length\+Opts(const char \texorpdfstring{$\ast$}{*}value, size\+\_\+t buffer\+\_\+length, const char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}return\+\_\+parse\+\_\+end, c\+JSON\+\_\+bool require\+\_\+null\+\_\+terminated)}.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md115}{}\doxysubsection{\texorpdfstring{Printing JSON}{Printing JSON}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md115}
+Given a tree of {\ttfamily \doxylink{structc_j_s_o_n}{c\+JSON}} items, you can print them as a string using {\ttfamily c\+JSON\+\_\+\+Print}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{char}\ *\textcolor{keywordtype}{string}\ =\ cJSON\_Print(json);}
+
+\end{DoxyCode}
+
+
+It will allocate a string and print a JSON representation of the tree into it. Once it returns, you are fully responsible for deallocating it after use with your allocator. (usually {\ttfamily free}, depends on what has been set with {\ttfamily c\+JSON\+\_\+\+Init\+Hooks}).
+
+{\ttfamily c\+JSON\+\_\+\+Print} will print with whitespace for formatting. If you want to print without formatting, use {\ttfamily c\+JSON\+\_\+\+Print\+Unformatted}.
+
+If you have a rough idea of how big your resulting string will be, you can use {\ttfamily c\+JSON\+\_\+\+Print\+Buffered(const c\+JSON \texorpdfstring{$\ast$}{*}item, int prebuffer, c\+JSON\+\_\+bool fmt)}. {\ttfamily fmt} is a boolean to turn formatting with whitespace on and off. {\ttfamily prebuffer} specifies the first buffer size to use for printing. {\ttfamily c\+JSON\+\_\+\+Print} currently uses 256 bytes for its first buffer size. Once printing runs out of space, a new buffer is allocated and the old gets copied over before printing is continued.
+
+These dynamic buffer allocations can be completely avoided by using {\ttfamily c\+JSON\+\_\+\+Print\+Preallocated(c\+JSON \texorpdfstring{$\ast$}{*}item, char \texorpdfstring{$\ast$}{*}buffer, const int length, const c\+JSON\+\_\+bool format)}. It takes a buffer to a pointer to print to and its length. If the length is reached, printing will fail and it returns {\ttfamily 0}. In case of success, {\ttfamily 1} is returned. Note that you should provide 5 bytes more than is actually needed, because \doxylink{structc_j_s_o_n}{c\+JSON} is not 100\% accurate in estimating if the provided memory is enough.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md116}{}\doxysubsection{\texorpdfstring{Example}{Example}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md116}
+In this example we want to build and parse the following JSON\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ "{}name"{}:\ "{}Awesome\ 4K"{},}
+\DoxyCodeLine{\ \ \ \ "{}resolutions"{}:\ [}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}width"{}:\ 1280,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}height"{}:\ 720}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}width"{}:\ 1920,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}height"{}:\ 1080}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}width"{}:\ 3840,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}height"{}:\ 2160}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ ]}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md117}{}\doxysubsubsection{\texorpdfstring{Printing}{Printing}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md117}
+Let\textquotesingle{}s build the above JSON and print it to a string\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//create\ a\ monitor\ with\ a\ list\ of\ supported\ resolutions}}
+\DoxyCodeLine{\textcolor{comment}{//NOTE:\ Returns\ a\ heap\ allocated\ string,\ you\ are\ required\ to\ free\ it\ after\ use.}}
+\DoxyCodeLine{\textcolor{keywordtype}{char}\ *create\_monitor(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ resolution\_numbers[3][2]\ =\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{1280,\ 720\},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{1920,\ 1080\},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{3840,\ 2160\}}
+\DoxyCodeLine{\ \ \ \ \};}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{char}\ *\textcolor{keywordtype}{string}\ =\ NULL;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *name\ =\ NULL;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *resolutions\ =\ NULL;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *resolution\ =\ NULL;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *width\ =\ NULL;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *height\ =\ NULL;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{size\_t}\ index\ =\ 0;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *monitor\ =\ cJSON\_CreateObject();}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (monitor\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ name\ =\ cJSON\_CreateString(\textcolor{stringliteral}{"{}Awesome\ 4K"{}});}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (name\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{/*\ after\ creation\ was\ successful,\ immediately\ add\ it\ to\ the\ monitor,}}
+\DoxyCodeLine{\textcolor{comment}{\ \ \ \ \ *\ thereby\ transferring\ ownership\ of\ the\ pointer\ to\ it\ */}}
+\DoxyCodeLine{\ \ \ \ cJSON\_AddItemToObject(monitor,\ \textcolor{stringliteral}{"{}name"{}},\ name);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ resolutions\ =\ cJSON\_CreateArray();}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (resolutions\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ cJSON\_AddItemToObject(monitor,\ \textcolor{stringliteral}{"{}resolutions"{}},\ resolutions);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ (index\ =\ 0;\ index\ <\ (\textcolor{keyword}{sizeof}(resolution\_numbers)\ /\ (2\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int})));\ ++index)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ resolution\ =\ cJSON\_CreateObject();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (resolution\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cJSON\_AddItemToArray(resolutions,\ resolution);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ width\ =\ cJSON\_CreateNumber(resolution\_numbers[index][0]);}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (width\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cJSON\_AddItemToObject(resolution,\ \textcolor{stringliteral}{"{}width"{}},\ width);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ height\ =\ cJSON\_CreateNumber(resolution\_numbers[index][1]);}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (height\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cJSON\_AddItemToObject(resolution,\ \textcolor{stringliteral}{"{}height"{}},\ height);}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{string}\ =\ cJSON\_Print(monitor);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keywordtype}{string}\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Failed\ to\ print\ monitor.\(\backslash\)n"{}});}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{end:}
+\DoxyCodeLine{\ \ \ \ cJSON\_Delete(monitor);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ string;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Alternatively we can use the {\ttfamily c\+JSON\+\_\+\+Add...To\+Object} helper functions to make our lives a little easier\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//NOTE:\ Returns\ a\ heap\ allocated\ string,\ you\ are\ required\ to\ free\ it\ after\ use.}}
+\DoxyCodeLine{\textcolor{keywordtype}{char}\ *create\_monitor\_with\_helpers(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ resolution\_numbers[3][2]\ =\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{1280,\ 720\},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{1920,\ 1080\},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{3840,\ 2160\}}
+\DoxyCodeLine{\ \ \ \ \};}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{char}\ *\textcolor{keywordtype}{string}\ =\ NULL;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *resolutions\ =\ NULL;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{size\_t}\ index\ =\ 0;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *monitor\ =\ cJSON\_CreateObject();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (cJSON\_AddStringToObject(monitor,\ \textcolor{stringliteral}{"{}name"{}},\ \textcolor{stringliteral}{"{}Awesome\ 4K"{}})\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ resolutions\ =\ cJSON\_AddArrayToObject(monitor,\ \textcolor{stringliteral}{"{}resolutions"{}});}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (resolutions\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ (index\ =\ 0;\ index\ <\ (\textcolor{keyword}{sizeof}(resolution\_numbers)\ /\ (2\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int})));\ ++index)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *resolution\ =\ cJSON\_CreateObject();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cJSON\_AddNumberToObject(resolution,\ \textcolor{stringliteral}{"{}width"{}},\ resolution\_numbers[index][0])\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cJSON\_AddNumberToObject(resolution,\ \textcolor{stringliteral}{"{}height"{}},\ resolution\_numbers[index][1])\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cJSON\_AddItemToArray(resolutions,\ resolution);}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{string}\ =\ cJSON\_Print(monitor);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keywordtype}{string}\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Failed\ to\ print\ monitor.\(\backslash\)n"{}});}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{end:}
+\DoxyCodeLine{\ \ \ \ cJSON\_Delete(monitor);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ string;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md118}{}\doxysubsubsection{\texorpdfstring{Parsing}{Parsing}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md118}
+In this example we will parse a JSON in the above format and check if the monitor supports a Full HD resolution while printing some diagnostic output\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{/*\ return\ 1\ if\ the\ monitor\ supports\ full\ hd,\ 0\ otherwise\ */}}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ supports\_full\_hd(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\ \textcolor{keyword}{const}\ monitor)}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *resolution\ =\ NULL;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *resolutions\ =\ NULL;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *name\ =\ NULL;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ status\ =\ 0;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *monitor\_json\ =\ cJSON\_Parse(monitor);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (monitor\_json\ ==\ NULL)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *error\_ptr\ =\ cJSON\_GetErrorPtr();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (error\_ptr\ !=\ NULL)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Error\ before:\ \%s\(\backslash\)n"{}},\ error\_ptr);}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ status\ =\ 0;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ name\ =\ cJSON\_GetObjectItemCaseSensitive(monitor\_json,\ \textcolor{stringliteral}{"{}name"{}});}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (cJSON\_IsString(name)\ \&\&\ (name-\/>valuestring\ !=\ NULL))}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Checking\ monitor\ \(\backslash\)"{}\%s\(\backslash\)"{}\(\backslash\)n"{}},\ name-\/>valuestring);}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ resolutions\ =\ cJSON\_GetObjectItemCaseSensitive(monitor\_json,\ \textcolor{stringliteral}{"{}resolutions"{}});}
+\DoxyCodeLine{\ \ \ \ cJSON\_ArrayForEach(resolution,\ resolutions)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *width\ =\ cJSON\_GetObjectItemCaseSensitive(resolution,\ \textcolor{stringliteral}{"{}width"{}});}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{structc_j_s_o_n}{cJSON}}\ *height\ =\ cJSON\_GetObjectItemCaseSensitive(resolution,\ \textcolor{stringliteral}{"{}height"{}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!cJSON\_IsNumber(width)\ ||\ !cJSON\_IsNumber(height))}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ status\ =\ 0;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((width-\/>valuedouble\ ==\ 1920)\ \&\&\ (height-\/>valuedouble\ ==\ 1080))}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ status\ =\ 1;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ end;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{end:}
+\DoxyCodeLine{\ \ \ \ cJSON\_Delete(monitor\_json);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ status;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Note that there are no NULL checks except for the result of {\ttfamily c\+JSON\+\_\+\+Parse} because {\ttfamily c\+JSON\+\_\+\+Get\+Object\+Item\+Case\+Sensitive} checks for {\ttfamily NULL} inputs already, so a {\ttfamily NULL} value is just propagated and {\ttfamily c\+JSON\+\_\+\+Is\+Number} and {\ttfamily c\+JSON\+\_\+\+Is\+String} return {\ttfamily 0} if the input is {\ttfamily NULL}.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md119}{}\doxysubsection{\texorpdfstring{Caveats}{Caveats}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md119}
+\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md120}{}\doxysubsubsection{\texorpdfstring{Zero Character}{Zero Character}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md120}
+\doxylink{structc_j_s_o_n}{c\+JSON} doesn\textquotesingle{}t support strings that contain the zero character `'\textbackslash{}0\textquotesingle{}{\ttfamily or}\textbackslash{}u0000\`{}. This is impossible with the current API because strings are zero terminated.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md121}{}\doxysubsubsection{\texorpdfstring{Character Encoding}{Character Encoding}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md121}
+\doxylink{structc_j_s_o_n}{c\+JSON} only supports UTF-\/8 encoded input. In most cases it doesn\textquotesingle{}t reject invalid UTF-\/8 as input though, it just propagates it through as is. As long as the input doesn\textquotesingle{}t contain invalid UTF-\/8, the output will always be valid UTF-\/8.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md122}{}\doxysubsubsection{\texorpdfstring{C Standard}{C Standard}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md122}
+\doxylink{structc_j_s_o_n}{c\+JSON} is written in ANSI C (or C89, C90). If your compiler or C library doesn\textquotesingle{}t follow this standard, correct behavior is not guaranteed.
+
+NOTE\+: ANSI C is not C++ therefore it shouldn\textquotesingle{}t be compiled with a C++ compiler. You can compile it with a C compiler and link it with your C++ code however. Although compiling with a C++ compiler might work, correct behavior is not guaranteed.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md123}{}\doxysubsubsection{\texorpdfstring{Floating Point Numbers}{Floating Point Numbers}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md123}
+\doxylink{structc_j_s_o_n}{c\+JSON} does not officially support any {\ttfamily double} implementations other than IEEE754 double precision floating point numbers. It might still work with other implementations but bugs with these will be considered invalid.
+
+The maximum length of a floating point literal that \doxylink{structc_j_s_o_n}{c\+JSON} supports is currently 63 characters.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md124}{}\doxysubsubsection{\texorpdfstring{Deep Nesting Of Arrays And Objects}{Deep Nesting Of Arrays And Objects}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md124}
+\doxylink{structc_j_s_o_n}{c\+JSON} doesn\textquotesingle{}t support arrays and objects that are nested too deeply because this would result in a stack overflow. To prevent this \doxylink{structc_j_s_o_n}{c\+JSON} limits the depth to {\ttfamily CJSON\+\_\+\+NESTING\+\_\+\+LIMIT} which is 1000 by default but can be changed at compile time.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md125}{}\doxysubsubsection{\texorpdfstring{Thread Safety}{Thread Safety}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md125}
+In general \doxylink{structc_j_s_o_n}{c\+JSON} is {\bfseries{not thread safe}}.
+
+However it is thread safe under the following conditions\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily c\+JSON\+\_\+\+Get\+Error\+Ptr} is never used (the {\ttfamily return\+\_\+parse\+\_\+end} parameter of {\ttfamily c\+JSON\+\_\+\+Parse\+With\+Opts} can be used instead)
+\item {\ttfamily c\+JSON\+\_\+\+Init\+Hooks} is only ever called before using \doxylink{structc_j_s_o_n}{c\+JSON} in any threads.
+\item {\ttfamily setlocale} is never called before all calls to \doxylink{structc_j_s_o_n}{c\+JSON} functions have returned.
+\end{DoxyItemize}\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md126}{}\doxysubsubsection{\texorpdfstring{Case Sensitivity}{Case Sensitivity}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md126}
+When \doxylink{structc_j_s_o_n}{c\+JSON} was originally created, it didn\textquotesingle{}t follow the JSON standard and didn\textquotesingle{}t make a distinction between uppercase and lowercase letters. If you want the correct, standard compliant, behavior, you need to use the {\ttfamily Case\+Sensitive} functions where available.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md127}{}\doxysubsubsection{\texorpdfstring{Duplicate Object Members}{Duplicate Object Members}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md127}
+\doxylink{structc_j_s_o_n}{c\+JSON} supports parsing and printing JSON that contains objects that have multiple members with the same name. {\ttfamily c\+JSON\+\_\+\+Get\+Object\+Item\+Case\+Sensitive} however will always only return the first one.\hypertarget{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md128}{}\doxysection{\texorpdfstring{Enjoy c\+JSON!}{Enjoy cJSON!}}\label{md_lib_2c_j_s_o_n_2_r_e_a_d_m_e_autotoc_md128}
+
+\begin{DoxyItemize}
+\item Dave Gamble (original author)
+\item Max Bruckner and Alan Wang (current maintainer)
+\item and the other \doxysectlink{md_lib_2c_j_s_o_n_2_c_o_n_t_r_i_b_u_t_o_r_s}{c\+JSON contributors}{0} 
+\end{DoxyItemize}

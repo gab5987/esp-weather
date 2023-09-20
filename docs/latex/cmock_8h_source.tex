@@ -1,0 +1,20 @@
+\doxysection{cmock.\+h}
+\hypertarget{cmock_8h_source}{}\label{cmock_8h_source}\index{lib/cJSON/tests/unity/test/testdata/cmock.h@{lib/cJSON/tests/unity/test/testdata/cmock.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ CMOCK\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ CMOCK\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{keywordtype}{int}\ CMockMemFreeFinalCounter\ =\ 0;}
+\DoxyCodeLine{00005\ \textcolor{keywordtype}{int}\ mockMock\_Init\_Counter\ =\ 0;}
+\DoxyCodeLine{00006\ \textcolor{keywordtype}{int}\ mockMock\_Verify\_Counter\ =\ 0;}
+\DoxyCodeLine{00007\ \textcolor{keywordtype}{int}\ mockMock\_Destroy\_Counter\ =\ 0;}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keywordtype}{void}\ CMock\_Guts\_MemFreeFinal(\textcolor{keywordtype}{void})\ \{\ CMockMemFreeFinalCounter++;\ \}}
+\DoxyCodeLine{00010\ \textcolor{keywordtype}{void}\ mockMock\_Init(\textcolor{keywordtype}{void})\ \ \ \ \ \ \ \ \ \ \ \{\ mockMock\_Init\_Counter++;\ \ \ \ \}}
+\DoxyCodeLine{00011\ \textcolor{keywordtype}{void}\ mockMock\_Verify(\textcolor{keywordtype}{void})\ \ \ \ \ \ \ \ \ \{\ mockMock\_Verify\_Counter++;\ \ \}}
+\DoxyCodeLine{00012\ \textcolor{keywordtype}{void}\ mockMock\_Destroy(\textcolor{keywordtype}{void})\ \ \ \ \ \ \ \ \{\ mockMock\_Destroy\_Counter++;\ \}}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//CMOCK\_H}}
+
+\end{DoxyCode}
