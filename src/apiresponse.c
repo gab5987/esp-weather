@@ -3,7 +3,7 @@
 #include "core/weatherapi_response.h"
 #include "esp_err.h"
 #include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 
 weatherapi_response_t deserialized_response = {0};
 
@@ -46,14 +46,20 @@ weatherapi_response_t *get_deserialized_onecall(void)
     }
 
     {
-        struct weatherapi_desc_current_weather_t current_weather = {0};
         cJSON *current = cJSON_GetObjectItemCaseSensitive(json, "current");
+        cJSON_get_value_number(current, deserialized_response.current.dt, "dt", false);
+        cJSON_get_value_number(current, deserialized_response.current.sunrise, "sunrise", false);
+        cJSON_get_value_number(current, deserialized_response.current.sunset, "sunset", false);
+        cJSON_get_value_number(current, deserialized_response.current.temp, "temp", true);
+        cJSON_get_value_number(current, deserialized_response.current.feels_like, "feels_like", true);
+        cJSON_get_value_number(current, deserialized_response.current.pressure, "pressure", false);
+        cJSON_get_value_number(current, deserialized_response.current.humidity, "humidity", false);
+        cJSON_get_value_number(current, deserialized_response.current.clouds, "clouds", false);
+        cJSON_get_value_number(current, deserialized_response.current.visibility, "visibility", false);
+        cJSON_get_value_number(current, deserialized_response.current.wind_speed, "wind_speed", false);
+        cJSON_get_value_number(current, deserialized_response.current.wind_deg, "wind_deg", false);
 
-        cJSON_get_value_number(current, current_weather.dt, "dt", false);
-        cJSON_get_value_number(current, current_weather.clouds, "clouds", false);
-        cJSON_get_value_number(current, current_weather.temp, "temp", true);
-
-        struct weatherapi_weather_name_t weather_name[3];
+        struct weatherapi_weather_name_t weather_name[DAILY_MAX_WEATHER_REPORT];
         cJSON *json_weather_name = cJSON_GetObjectItemCaseSensitive(current, "weather");
         for (int i = 0; i < cJSON_GetArraySize(json_weather_name); i++)
         {
@@ -64,13 +70,26 @@ weatherapi_response_t *get_deserialized_onecall(void)
             cJSON_get_value_string(subitem, weather_name[i].description, "description");
         }
 
-        memcpy(&deserialized_response.current.weather, &weather_name, sizeof(struct weatherapi_weather_name_t));
+        memcpy(&deserialized_response.current.weather, &weather_name,
+               DAILY_MAX_WEATHER_REPORT * sizeof(struct weatherapi_weather_name_t));
     }
 
-    printf("dt: %ld \n", current_weather.dt);
-    printf("clouds: %d \n", current_weather.clouds);
-    printf("temp: %.2f \n", current_weather.temp);
-    printf("WatherDesc: %s \n", weather_name[0].description);
+    {
+        struct weatherapi_desc_alerts_t weather_alerts[MAX_WEATHER_ALERTS];
+        cJSON *json_weather_alerts = cJSON_GetObjectItemCaseSensitive(json, "alerts");
+        for (int i = 0; i < cJSON_GetArraySize(json_weather_alerts); i++)
+        {
+            if (i == DAILY_MAX_WEATHER_REPORT)
+                break;
+            cJSON *subitem = cJSON_GetArrayItem(json_weather_alerts, i);
+            cJSON_get_value_string(subitem, weather_alerts[i].description, "description");
+            cJSON_get_value_string(subitem, weather_alerts[i].event, "event");
+            cJSON_get_value_string(subitem, weather_alerts[i].sender_name, "sender_name");
+        }
+
+        memcpy(&deserialized_response.alerts, &weather_alerts,
+               MAX_WEATHER_ALERTS * sizeof(struct weatherapi_desc_alerts_t));
+    }
 
 cleanup:
     /*

@@ -3,6 +3,7 @@
 #include <esp_netif.h>
 #include <nvs.h>
 #include <nvs_flash.h>
+#include <stdio.h>
 
 #include "cJSON.h"
 #include "config.h"
@@ -21,7 +22,20 @@ void app_main()
     }
     wifi_init(WIFI_SSID, WIFI_PASS);
 
-    get_deserialized_onecall();
+    weatherapi_response_t *re = get_deserialized_onecall();
+
+    printf("dt: %ld \n", re->current.dt);
+    printf("clouds: %d \n", re->current.clouds);
+    printf("temp: %.2f \n", re->current.temp);
+    printf("WatherDesc: %s \n", re->current.weather[0].description);
+
+    printf("\n\n");
+    for (int i = 0; i < MAX_WEATHER_ALERTS; i++)
+    {
+        printf("sender_name: %s\n", re->alerts[i].sender_name);
+        printf("event: %s\n", re->alerts[i].event);
+        printf("description: %s\n", re->alerts[i].description);
+    }
 
     for (;;)
     {
