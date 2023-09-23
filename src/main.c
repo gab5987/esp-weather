@@ -6,8 +6,9 @@
 
 #include "cJSON.h"
 #include "config.h"
+#include "core/networking.h"
+#include "core/weatherapi_response.h"
 #include "core/wifi.h"
-#include "networking.h"
 
 void app_main()
 {
@@ -20,20 +21,11 @@ void app_main()
     }
     wifi_init(WIFI_SSID, WIFI_PASS);
 
-    cJSON *json = cJSON_Parse(make_weather_request());
-    if (json == NULL)
-    {
-        const char *error_ptr = cJSON_GetErrorPtr();
-        if (error_ptr != NULL)
-        {
-            printf("Error: %s\n", error_ptr);
-        }
-        cJSON_Delete(json);
-    }
+    get_deserialized_onecall();
 
-    cJSON *name = cJSON_GetObjectItemCaseSensitive(json, "timezone");
-    if (cJSON_IsString(name) && (name->valuestring != NULL))
+    for (;;)
     {
-        printf("Timezone: %s\n", name->valuestring);
+        vTaskDelay(100);
+        // Must never get here
     }
 }
