@@ -56,10 +56,11 @@ struct weatherapi_desc_alerts_t
 };
 
 #define MAX_WEATHER_ALERTS 4
+#define MAX_DAYS_FORECAST 8
 typedef struct weatherapi_response_t
 {
     struct weatherapi_desc_current_weather_t current;
-    struct weatherapi_desc_daily_weather_t daily[8];
+    struct weatherapi_desc_daily_weather_t daily[MAX_DAYS_FORECAST];
     struct weatherapi_desc_alerts_t alerts[MAX_WEATHER_ALERTS];
 } weatherapi_response_t;
 

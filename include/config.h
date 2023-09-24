@@ -7,6 +7,8 @@
 #define WIFI_SSID "gabriel_IoT"
 #define WIFI_PASS "b1e3l245"
 
-extern const char *OPEN_WEATHER_API_BASE_URI;
+#define TIMEZONE_OFFSET (int)(-3)
+
+extern const char *OPEN_WEATHER_API_BASE_URIf;
 
 #endif
