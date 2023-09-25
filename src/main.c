@@ -35,7 +35,7 @@ void app_main()
 
     printf("Nuvens(clouds): %d%% \n", re->current.clouds);
     printf("Temperatura(temp): %.2f °C \n", kelvin_to_celcius(re->current.temp));
-    printf("Descricao: %s \n", re->current.weather[0].description);
+    // printf("Descricao: %s \n", re->current.weather[0].description);
 
     for (int i = 0; i < MAX_DAYS_FORECAST; i++)
     {
