@@ -14,7 +14,7 @@
 #include <sys/param.h>
 
 #include "config.h"
-#include "core/networking.h"
+#include "networking.h"
 
 #define MAX_HTTP_RECV_BUFFER 1024 * 10
 static const char *TAG = "network";

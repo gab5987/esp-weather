@@ -1,9 +1,10 @@
 #include "cJSON.h"
-#include "core/networking.h"
-#include "core/weatherapi_response.h"
+#include "networking.h"
+#include "weatherapi_response.h"
 #include "esp_err.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 weatherapi_response_t deserialized_response = {0};
 
@@ -66,11 +67,6 @@ weatherapi_response_t *get_deserialized_onecall(void)
 
         memcpy(&deserialized_response.current.weather, &weather_name, sizeof(struct weatherapi_weather_name_t));
     }
-
-    printf("dt: %ld \n", current_weather.dt);
-    printf("clouds: %d \n", current_weather.clouds);
-    printf("temp: %.2f \n", current_weather.temp);
-    printf("WatherDesc: %s \n", weather_name[0].description);
 
 cleanup:
     /*
