@@ -9,6 +9,7 @@
 #include "config.h"
 #include "conversion.h"
 #include "hal/spi_types.h"
+#include "icons/icons_16x16.h"
 #include "networking.h"
 #include "weatherapi_response.h"
 #include "wifi.h"
@@ -25,9 +26,7 @@ void app_main()
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
-    // wifi_init(WIFI_SSID, WIFI_PASS);
-
-    // get_deserialized_onecall();
+    wifi_init(WIFI_SSID, WIFI_PASS);
 
     EpdDevice_t display = {
         .busy = 4,
@@ -41,8 +40,12 @@ void app_main()
 
     Epd_Initilize(&display);
 
-    memset(display.buffer, 0, EPD_BUFFER_SIZE / 2);
-    Epd_Render(&display);
+    // Epd_ClearDisplay(&display);
+
+    // for (int i = 0; i < 4; i++)
+    //{
+    //     Epd_DiplayBmp(&display, 18 * i, 64, 16, 16, battery_0_bar_0deg_16x16);
+    // }
 
     /*
     weatherapi_response_t *re = get_deserialized_onecall();
@@ -87,7 +90,12 @@ void app_main()
         printf("event: %s\n", re->alerts[i].event);
         printf("description: %s\n", re->alerts[i].description);
     }
+
     */
+
+    Epd_DrawText(&display, 10, 10, "teste", 12, false);
+
+    Epd_Render(&display);
 
     for (;;)
     {

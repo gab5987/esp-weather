@@ -5,6 +5,7 @@ clang
 
 -I/Users/gabrielnovalski/Documents/esp-weather-station/include
 -I/Users/gabrielnovalski/Documents/esp-weather-station/src
+-I/Users/gabrielnovalski/Documents/esp-weather-station/lib/epd
 -I/Users/gabrielnovalski/Documents/esp-weather-station/lib/cJSON
 -I/Users/gabrielnovalski/.platformio/packages/framework-espidf/components/xtensa/include
 -I/Users/gabrielnovalski/.platformio/packages/framework-espidf/components/xtensa/esp32/include
@@ -137,7 +138,7 @@ clang
 -I/Users/gabrielnovalski/.platformio/packages/framework-espidf/components/perfmon/include
 -I/Users/gabrielnovalski/.platformio/packages/framework-espidf/components/spiffs/include
 -I/Users/gabrielnovalski/.platformio/packages/framework-espidf/components/wifi_provisioning/include
--I/Users/gabrielnovalski/Documents/esp-weather-station/lib/epd
+-I/Users/gabrielnovalski/Documents/esp-weather-station/lib/epd_font
 -I/Users/gabrielnovalski/.platformio/packages/toolchain-xtensa-esp32/xtensa-esp32-elf/include/c++/12.2.0
 -I/Users/gabrielnovalski/.platformio/packages/toolchain-xtensa-esp32/xtensa-esp32-elf/include/c++/12.2.0/xtensa-esp32-elf
 -I/Users/gabrielnovalski/.platformio/packages/toolchain-xtensa-esp32/lib/gcc/xtensa-esp32-elf/12.2.0/include

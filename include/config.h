@@ -4,7 +4,7 @@
 #define ESP_WIFI_CHANNEL 1
 #define MAX_STA_CONN 2
 
-#define WIFI_SSID "gabriel_IoT"
+#define WIFI_SSID "gabriel_2.4"
 #define WIFI_PASS "b1e3l245"
 
 #define TIMEZONE_OFFSET (int)(-3)

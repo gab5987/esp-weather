@@ -1,11 +1,11 @@
 mkdir -p icons
 mkdir -p png
 
-SVG_FILES="svg/*.svg"
-PNG_PATH="png/${1}x${1}"
+SVG_FILES="font/*.svg"
+PNG_PATH="png/${1}x${2}"
 PNG_FILES="${PNG_PATH}/*.png"
-HEADER_PATH="icons/${1}x${1}"
-HEADER="icons/icons_${1}x${1}.h"
+HEADER_PATH="icons/${1}x${2}"
+HEADER="icons/icons_${1}x${2}.h"
 
 if [ -e "$PNG_PATH" ];then rm -rf "$PNG_PATH" ; fi
 mkdir $PNG_PATH
@@ -22,22 +22,22 @@ do
   # mogrify -format png -path $PNG_PATH -colorspace sRGB -density $DENSITY $f
 
   out="$PNG_PATH/$(basename $f .svg).png"
-  inkscape -w ${1} -h ${1} $f -o $out --export-background="#ffffff"
+  inkscape -w ${1} -h ${2} $f -o $out --export-background="#ffffff"
 done
 
 for f in $PNG_FILES
 do
   echo "Generating header for $f..."
-  out="${HEADER_PATH}/$(basename $f .png | tr -s -c [:alnum:] _)${1}x${1}.h"
+  out="${HEADER_PATH}/$(basename $f .png | tr -s -c [:alnum:] _)${1}x${2}.h"
   python3 png_to_header.py -i $f -o $out
 done
 
 echo "Generating include statements..."
-echo "#ifndef __ICONS_${1}x${1}_H__" > $HEADER
-echo "#define __ICONS_${1}x${1}_H__" >> $HEADER
+echo "#ifndef __ICONS_${1}x${2}_H__" > $HEADER
+echo "#define __ICONS_${1}x${2}_H__" >> $HEADER
 for f in ${HEADER_PATH}/*.h
 do
-    echo "#include \"${1}x${1}/$(basename $f)\"" >> $HEADER
+    echo "#include \"${1}x${2}/$(basename $f)\"" >> $HEADER
 done
 echo "#endif" >> $HEADER
 
