@@ -8,12 +8,13 @@
 
 static const char *TAG = "apiresponse";
 
-weatherapi_response_t deserialized_response = {0};
+WeatherapiResponse_t deserialized_response = {0};
 
 #define cJSON_get_value_number(jsonptr, variable, from_key, isfloat)                                                   \
     {                                                                                                                  \
         cJSON *item = cJSON_GetObjectItemCaseSensitive(jsonptr, from_key);                                             \
-        variable = isfloat ? (float)item->valuedouble : item->valueint;                                                \
+        if (item != NULL)                                                                                              \
+            variable = isfloat ? (float)item->valuedouble : item->valueint;                                            \
     }
 
 #define cJSON_get_value_string(jsonptr, variable, from_key)                                                            \
@@ -25,7 +26,6 @@ weatherapi_response_t deserialized_response = {0};
 
 inline static bool check_json_err(cJSON *obj, esp_err_t *err, const char *key)
 {
-    printf("key: %s, dt: %ld\n", key, deserialized_response.current.dt);
     if (obj == NULL)
     {
         const char *error_ptr = cJSON_GetErrorPtr();
@@ -37,12 +37,12 @@ inline static bool check_json_err(cJSON *obj, esp_err_t *err, const char *key)
     return true;
 }
 
-weatherapi_response_t *get_deserialized_onecall(void)
+WeatherapiResponse_t *Weather_GetDeserializedOnecall(void)
 {
     esp_err_t err = ESP_OK;
     cJSON *json = NULL;
 
-    char *net_response = make_weather_request();
+    char *net_response = Net_MakeWeatherRequest();
     if (net_response == NULL)
     {
         err = ESP_ERR_NOT_FINISHED;
@@ -147,14 +147,7 @@ weatherapi_response_t *get_deserialized_onecall(void)
     }
 
 cleanup:
-    /*
-      if (net_response != NULL)
-          free(net_response);
-      if (json != NULL)
-          free(json);
-    */
-    printf("\n\n\n\%ld\n\n", deserialized_response.current.dt);
-    if (err != ESP_OK)
-        return NULL;
+    if (json != NULL)
+        cJSON_free(json);
     return &deserialized_response;
 }

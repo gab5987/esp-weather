@@ -9,10 +9,10 @@
 #include "config.h"
 #include "conversion.h"
 #include "hal/spi_types.h"
-#include "icons/icons_16x16.h"
 #include "networking.h"
 #include "weatherapi_response.h"
 #include "wifi.h"
+#include "renderer.h"
 
 #include "cJSON.h"
 #include "epd4i2.h"
@@ -26,7 +26,6 @@ void app_main()
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
-    wifi_init(WIFI_SSID, WIFI_PASS);
 
     EpdDevice_t display = {
         .busy = 4,
@@ -40,26 +39,24 @@ void app_main()
 
     Epd_Initilize(&display);
 
-    // Epd_ClearDisplay(&display);
+    Wifi_Initialize(WIFI_SSID, WIFI_PASS);
 
-    // for (int i = 0; i < 4; i++)
-    //{
-    //     Epd_DiplayBmp(&display, 18 * i, 64, 16, 16, battery_0_bar_0deg_16x16);
-    // }
+    WeatherapiResponse_t *re = Weather_GetDeserializedOnecall();
+
+    Renderer_Render(&display, re);
 
     /*
-    weatherapi_response_t *re = get_deserialized_onecall();
 
     char time_bff[6] = {0};
-    epoch_to_time_string(&re->current.dt, time_bff);
+    Conv_Epoch2TimeString(&re->current.dt, time_bff);
     printf("Atualizado em(dt): %s \n", time_bff);
-    epoch_to_time_string(&re->current.sunrise, time_bff);
+    Conv_Epoch2TimeString(&re->current.sunrise, time_bff);
     printf("Nascer do sol(sunrise): %s \n", time_bff);
-    epoch_to_time_string(&re->current.sunset, time_bff);
+    Conv_Epoch2TimeString(&re->current.sunset, time_bff);
     printf("Por do sol(sunset): %s \n", time_bff);
 
     printf("Nuvens(clouds): %d%% \n", re->current.clouds);
-    printf("Temperatura(temp): %.2f °C \n", kelvin_to_celcius(re->current.temp));
+    printf("Temperatura(temp): %.2f °C Conv_Kelvin2Celcius\n", Conv_Kelvin2Celcius(re->current.temp));
     // printf("Descricao: %s \n", re->current.weather[0].description);
 
     for (int i = 0; i < MAX_DAYS_FORECAST; i++)
@@ -67,17 +64,17 @@ void app_main()
         if (!re->daily[i].dt)
             break;
         printf("\n\n");
-        epoch_to_time_string(&re->daily[i].sunrise, time_bff);
+        Conv_Epoch2TimeString(&re->daily[i].sunrise, time_bff);
         printf("Nascer do sol(sunrise): %s \n", time_bff);
-        epoch_to_time_string(&re->daily[i].sunset, time_bff);
+        Conv_Epoch2TimeString(&re->daily[i].sunset, time_bff);
         printf("Por do sol(sunset): %s \n", time_bff);
 
         printf("Nuvens(clouds): %d%% \n", re->daily[i].clouds);
-        printf("Temperatura(temp): min -> %.2f °C | máx -> %.2f °C \n", kelvin_to_celcius(re->daily[i].temp.min),
-               kelvin_to_celcius(re->daily[i].temp.max));
+        printf("Temperatura(temp): min -> %.2f °C | máx -> %.2f °C \n", Conv_Kelvin2Celcius(re->daily[i].temp.min),
+               Conv_Kelvin2Celcius(re->daily[i].temp.max));
 
         printf("Sensacao térmica(feels_like): min -> %.2f °C | máx -> %.2f °C \n",
-               kelvin_to_celcius(re->daily[i].feels_like.min), kelvin_to_celcius(re->daily[i].feels_like.max));
+               Conv_Kelvin2Celcius(re->daily[i].feels_like.min), Conv_Kelvin2Celcius(re->daily[i].feels_like.max));
         printf("Descricao: %s \n", re->daily[i].weather[0].description);
     }
 
@@ -91,11 +88,19 @@ void app_main()
         printf("description: %s\n", re->alerts[i].description);
     }
 
+    char txt[30];
+    sprintf(txt, "Temperatura %d graus C", (int)Conv_Kelvin2Celcius(re->current.temp));
+    Epd_DrawText(&display, 10, 10, txt, 12, false);
+
+    Conv_Epoch2TimeString(&re->current.sunrise, time_bff);
+    sprintf(txt, "Nascer do sol %s", time_bff);
+    Epd_DrawText(&display, 10, 30, txt, 12, false);
+
+    Conv_Epoch2TimeString(&re->current.sunset, time_bff);
+    sprintf(txt, "Por do sol %s", time_bff);
+    Epd_DrawText(&display, 10, 50, txt, 12, false);
+
     */
-
-    Epd_DrawText(&display, 10, 10, "teste", 12, false);
-
-    Epd_Render(&display);
 
     for (;;)
     {

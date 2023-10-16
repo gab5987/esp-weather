@@ -3,36 +3,36 @@
 
 #include <esp_system.h>
 
-struct weatherapi_weather_name_t
+struct WeatherapiWeatherName_t
 {
     const char *main;
     const char *description;
 };
 
-struct weatherapi_desc_temp_t
+struct WeatherapiDescTemp_t
 {
     float min;
     float max;
 };
 
 #define DAILY_MAX_WEATHER_REPORT 3
-struct weatherapi_desc_daily_weather_t
+struct WeatherapiDescDailyWeather_t
 {
     unsigned long dt;
     unsigned long sunrise;
     unsigned long sunset;
-    struct weatherapi_desc_temp_t temp;
-    struct weatherapi_desc_temp_t feels_like;
+    struct WeatherapiDescTemp_t temp;
+    struct WeatherapiDescTemp_t feels_like;
     unsigned int pressure;
     u_int8_t humidity;
     u_int8_t clouds;
     unsigned int visibility;
     float wind_speed;
     u_int16_t wind_deg;
-    struct weatherapi_weather_name_t weather[DAILY_MAX_WEATHER_REPORT];
+    struct WeatherapiWeatherName_t weather[DAILY_MAX_WEATHER_REPORT];
 };
 
-struct weatherapi_desc_current_weather_t
+struct WeatherapiDescCurrentWeather_t
 {
     unsigned long dt;
     unsigned long sunrise;
@@ -45,10 +45,10 @@ struct weatherapi_desc_current_weather_t
     unsigned int visibility;
     float wind_speed;
     u_int16_t wind_deg;
-    struct weatherapi_weather_name_t weather[DAILY_MAX_WEATHER_REPORT];
+    struct WeatherapiWeatherName_t weather[DAILY_MAX_WEATHER_REPORT];
 };
 
-struct weatherapi_desc_alerts_t
+struct WeatherapiDescAlerts_t
 {
     const char *sender_name;
     const char *event;
@@ -57,13 +57,13 @@ struct weatherapi_desc_alerts_t
 
 #define MAX_WEATHER_ALERTS 4
 #define MAX_DAYS_FORECAST 8
-typedef struct weatherapi_response_t
+typedef struct WeatherapiResponse_t
 {
-    struct weatherapi_desc_current_weather_t current;
-    struct weatherapi_desc_daily_weather_t daily[MAX_DAYS_FORECAST];
-    struct weatherapi_desc_alerts_t alerts[MAX_WEATHER_ALERTS];
-} weatherapi_response_t;
+    struct WeatherapiDescCurrentWeather_t current;
+    struct WeatherapiDescDailyWeather_t daily[MAX_DAYS_FORECAST];
+    struct WeatherapiDescAlerts_t alerts[MAX_WEATHER_ALERTS];
+} WeatherapiResponse_t;
 
-weatherapi_response_t *get_deserialized_onecall(void);
+WeatherapiResponse_t *Weather_GetDeserializedOnecall(void);
 
 #endif

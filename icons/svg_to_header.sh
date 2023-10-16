@@ -1,7 +1,7 @@
 mkdir -p icons
 mkdir -p png
 
-SVG_FILES="font/*.svg"
+SVG_FILES="svg/*.svg"
 PNG_PATH="png/${1}x${2}"
 PNG_FILES="${PNG_PATH}/*.png"
 HEADER_PATH="icons/${1}x${2}"

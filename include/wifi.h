@@ -3,7 +3,7 @@
 
 #include <esp_err.h>
 
-void wifi_init(const char *ssid, const char *password);
+void Wifi_Initialize(const char *ssid, const char *password);
 
 #endif /* _WIFI_H_ */
 

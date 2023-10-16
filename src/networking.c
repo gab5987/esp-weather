@@ -23,7 +23,7 @@ const char *OPEN_WEATHER_API_BASE_URI = "api.openweathermap.org";
 
 char local_response_buffer[MAX_HTTP_RECV_BUFFER + 1] = {0};
 
-esp_err_t http_event_handler(esp_http_client_event_t *evt)
+esp_err_t Net_HttpEventHandler(esp_http_client_event_t *evt)
 {
     static int index;
     switch (evt->event_id)
@@ -59,7 +59,7 @@ esp_err_t http_event_handler(esp_http_client_event_t *evt)
     return ESP_OK;
 }
 
-char *make_weather_request(void)
+char *Net_MakeWeatherRequest(void)
 {
     memset(local_response_buffer, 0, MAX_HTTP_RECV_BUFFER);
     esp_http_client_config_t config = {
@@ -67,7 +67,7 @@ char *make_weather_request(void)
         .path = "/data/3.0/onecall",
         .query = "lat=-27.5752&lon=-48.4326&exclude=minutely,hourly&appid=5b3f53c4806893d97a2b5020a211e974&"
                  "lang=pt_br",
-        .event_handler = http_event_handler,
+        .event_handler = Net_HttpEventHandler,
         .disable_auto_redirect = true,
     };
 

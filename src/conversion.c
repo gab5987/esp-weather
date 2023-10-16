@@ -2,14 +2,14 @@
 #include "config.h"
 #include <stdio.h>
 
-inline float kelvin_to_celcius(float v)
+inline float Conv_Kelvin2Celcius(float v)
 {
     if (!v)
         return 0;
     return v - 273.15;
 }
 
-void epoch_to_time_string(const unsigned long *epoch_time, char bff[6])
+void Conv_Epoch2TimeString(const unsigned long *epoch_time, char bff[6])
 {
     int hours = 0, minutes = 0;
 
