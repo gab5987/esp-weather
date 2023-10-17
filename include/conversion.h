@@ -5,5 +5,7 @@
 
 float Conv_Kelvin2Celcius(float v);
 void Conv_Epoch2TimeString(const unsigned long *epoch_time, char bff[6]);
+int Conv_Epoch2DayOfWeek(const unsigned long *epoch_time);
+void Conv_DayOfWeek2String(unsigned int dayofweek, char buff[4]);
 
 #endif

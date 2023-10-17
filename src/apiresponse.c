@@ -94,40 +94,29 @@ WeatherapiResponse_t *Weather_GetDeserializedOnecall(void)
         {
             if (i == max_forecast_in_array)
                 break;
-            cJSON *subitem = cJSON_GetArrayItem(json_forecast, i);
+            cJSON *subitem = cJSON_GetArrayItem(json_forecast, i + 1);
             if (subitem == NULL)
                 continue;
 
             cJSON_get_value_number(subitem, deserialized_response.daily[i].dt, "dt", false);
-            cJSON_get_value_number(subitem, deserialized_response.daily[i].sunrise, "sunrise", false);
-            cJSON_get_value_number(subitem, deserialized_response.daily[i].sunset, "sunset", false);
-            cJSON_get_value_number(subitem, deserialized_response.daily[i].pressure, "pressure", false);
-            cJSON_get_value_number(subitem, deserialized_response.daily[i].humidity, "humidity", false);
-            cJSON_get_value_number(subitem, deserialized_response.daily[i].clouds, "clouds", false);
-            cJSON_get_value_number(subitem, deserialized_response.daily[i].visibility, "visibility", false);
-            cJSON_get_value_number(subitem, deserialized_response.daily[i].wind_speed, "wind_speed", false);
-            cJSON_get_value_number(subitem, deserialized_response.daily[i].wind_deg, "wind_deg", false);
 
             cJSON *temp = cJSON_GetObjectItemCaseSensitive(subitem, "temp");
             cJSON_get_value_number(temp, deserialized_response.daily[i].temp.max, "max", true);
             cJSON_get_value_number(temp, deserialized_response.daily[i].temp.min, "min", true);
 
-            cJSON *feels_like = cJSON_GetObjectItemCaseSensitive(subitem, "feels_like");
-            cJSON_get_value_number(feels_like, deserialized_response.daily[i].feels_like.max, "max", true);
-            cJSON_get_value_number(feels_like, deserialized_response.daily[i].feels_like.min, "min", true);
-
             const char *weather_key = "weather";
             cJSON *json_weather_name = cJSON_GetObjectItemCaseSensitive(subitem, weather_key);
             if (check_json_err(json_weather_name, &err, weather_key))
+            {
                 for (int w = 0; w < cJSON_GetArraySize(json_weather_name); w++)
                 {
                     if (w == DAILY_MAX_WEATHER_REPORT)
                         break;
                     cJSON *subitem = cJSON_GetArrayItem(json_weather_name, w);
                     cJSON_get_value_string(subitem, deserialized_response.daily[i].weather[w].main, "main");
-                    cJSON_get_value_string(subitem, deserialized_response.daily[i].weather[w].description,
-                                           "description");
+                    cJSON_get_value_number(subitem, deserialized_response.daily[i].weather[w].id, "id", false);
                 }
+            }
         }
     }
 

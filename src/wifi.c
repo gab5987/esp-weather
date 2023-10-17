@@ -57,7 +57,7 @@ static void Wifi_EventHandler(void *arg, esp_event_base_t event_base, int32_t ev
     }
 }
 
-void Wifi_Initialize(const char *ssid, const char *password)
+bool Wifi_Initialize(const char *ssid, const char *password)
 {
     s_wifi_event_group = xEventGroupCreate();
 
@@ -102,7 +102,7 @@ void Wifi_Initialize(const char *ssid, const char *password)
      * can test which event actually happened. */
     if (bits & WIFI_CONNECTED_BIT)
     {
-        return;
+        return true;
     }
     if (bits & WIFI_FAIL_BIT)
     {
@@ -112,4 +112,6 @@ void Wifi_Initialize(const char *ssid, const char *password)
     {
         ESP_LOGE(TAG, "UNEXPECTED EVENT");
     }
+
+    return false;
 }
