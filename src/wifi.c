@@ -108,3 +108,12 @@ bool Wifi_Initialize()
 
     return false;
 }
+
+void Wifi_Disable(void)
+{
+    esp_wifi_stop();
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+
+    esp_wifi_deinit();
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+}

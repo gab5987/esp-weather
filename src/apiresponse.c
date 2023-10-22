@@ -66,7 +66,6 @@ WeatherapiResponse_t *Weather_GetDeserializedOnecall(void)
         cJSON_get_value_number(current, deserialized_response.current.pressure, "pressure", false);
         cJSON_get_value_number(current, deserialized_response.current.humidity, "humidity", false);
         cJSON_get_value_number(current, deserialized_response.current.clouds, "clouds", false);
-        cJSON_get_value_number(current, deserialized_response.current.visibility, "visibility", false);
         cJSON_get_value_number(current, deserialized_response.current.wind_speed, "wind_speed", false);
         cJSON_get_value_number(current, deserialized_response.current.wind_deg, "wind_deg", false);
         cJSON_get_value_number(current, deserialized_response.current.uvi, "uvi", true);
@@ -126,21 +125,6 @@ WeatherapiResponse_t *Weather_GetDeserializedOnecall(void)
                     cJSON_get_value_number(subitem, deserialized_response.daily[i].weather[w].id, "id", false);
                 }
             }
-        }
-    }
-
-    const char *alerts_key = "alerts";
-    cJSON *json_weather_alerts = cJSON_GetObjectItemCaseSensitive(json, alerts_key);
-    if (check_json_err(json_weather_alerts, &err, alerts_key))
-    {
-        for (int i = 0; i < cJSON_GetArraySize(json_weather_alerts); i++)
-        {
-            if (i == DAILY_MAX_WEATHER_REPORT)
-                break;
-            cJSON *subitem = cJSON_GetArrayItem(json_weather_alerts, i);
-            cJSON_get_value_string(subitem, deserialized_response.alerts[i].description, "description");
-            cJSON_get_value_string(subitem, deserialized_response.alerts[i].event, "event");
-            cJSON_get_value_string(subitem, deserialized_response.alerts[i].sender_name, "sender_name");
         }
     }
 

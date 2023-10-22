@@ -9,6 +9,7 @@ extern "C"
 {
 #endif
     bool Wifi_Initialize();
+    void Wifi_Disable();
 #ifdef __cplusplus
 }
 #endif

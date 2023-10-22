@@ -37,26 +37,16 @@ struct WeatherapiDescCurrentWeather_t
     unsigned int pressure;
     u_int8_t humidity;
     u_int8_t clouds;
-    unsigned int visibility;
     float wind_speed;
     u_int16_t wind_deg;
     struct WeatherapiWeatherName_t weather[DAILY_MAX_WEATHER_REPORT];
 };
 
-struct WeatherapiDescAlerts_t
-{
-    const char *sender_name;
-    const char *event;
-    const char *description;
-};
-
-#define MAX_WEATHER_ALERTS 4
 #define MAX_DAYS_FORECAST 5
 typedef struct WeatherapiResponse_t
 {
     struct WeatherapiDescCurrentWeather_t current;
     struct WeatherapiDescDailyWeather_t daily[MAX_DAYS_FORECAST];
-    struct WeatherapiDescAlerts_t alerts[MAX_WEATHER_ALERTS];
 } WeatherapiResponse_t;
 
 #ifdef __cplusplus

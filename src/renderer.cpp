@@ -314,6 +314,11 @@ void Renderer_RenderWeeklyForecast(GxEPD_Class *display, struct WeatherapiDescDa
     }
 }
 
+static const char *compass[8] = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+static const unsigned char *compass_icons[8] = {wi_wind_180deg_32x32, wi_wind_225deg_32x32, wi_wind_270deg_32x32,
+                                                wi_wind_315deg_32x32, wi_wind_0deg_32x32,   wi_wind_45deg_32x32,
+                                                wi_wind_90deg_32x32,  wi_wind_135deg_32x32};
+
 #define INFO_SECTION_SIZE (int)126
 static void Renderer_DrawInfo(GxEPD_Class *display, const uint8_t *bitmap, int x, int y, const char *label,
                               const char *info)
@@ -359,16 +364,39 @@ void Renderer_RenderCurrentWeather(GxEPD_Class *display, struct WeatherapiDescCu
     sprintf(buff, "%d%%", weather->humidity);
     Renderer_DrawInfo(display, wi_humidity_32x32, (xaxis += INFO_SECTION_SIZE), yaxis, "Humidity", buff);
 
-    const char *compass[8] = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
-    const unsigned char *compass_icons[8] = {wi_wind_180deg_32x32, wi_wind_225deg_32x32, wi_wind_270deg_32x32,
-                                             wi_wind_315deg_32x32, wi_wind_0deg_32x32,   wi_wind_45deg_32x32,
-                                             wi_wind_90deg_32x32,  wi_wind_135deg_32x32};
     int windspeed = (int)(3.6 * weather->wind_speed);
     int winddir = (weather->wind_deg + 360) % 360;
     winddir = (winddir + 22) / 45;
 
+    if (winddir > 7)
+        winddir = 0;
     sprintf(buff, "%d Km/h %s", windspeed, compass[winddir]);
     Renderer_DrawInfo(display, compass_icons[winddir], (xaxis = 200), (yaxis = 6), "Wind", buff);
+}
+
+static const unsigned char *baticon[] = {battery_0_bar_90deg_24x24, battery_2_bar_90deg_24x24,
+                                         battery_4_bar_90deg_24x24, battery_6_bar_90deg_24x24,
+                                         battery_full_90deg_24x24};
+
+void Renderer_RenderSystemStatus(GxEPD_Class *display, time_t *updatetime, int batlevel)
+{
+    int xaxis = 260, yaxis = 14;
+    display->setFont(&TomThumb);
+
+    display->drawBitmap(wi_cloud_down_24x24, xaxis, 0, 24, 24, GxEPD_BLACK, GxEPD::bm_mode::bm_invert);
+    display->setCursor((xaxis += 28), yaxis);
+
+    char buff[32];
+    *updatetime += (TIMEZONE_OFFSET * 3600);
+    struct tm ts = *localtime(updatetime);
+    strftime(buff, sizeof(buff), "%d/%m - %H:%M", &ts);
+    display->printf(buff);
+
+    int batindex = (batlevel < 0) ? 0 : (batlevel >= 100) ? 4 : (batlevel - 1) / 25;
+
+    display->drawBitmap(baticon[batindex], (xaxis += 56), 0, 24, 24, GxEPD_BLACK, GxEPD::bm_mode::bm_invert);
+    display->setCursor((xaxis += 28), yaxis);
+    display->printf("%d%%", batlevel);
 }
 
 static void Renderer_DrawMessage(GxEPD_Class *display, const char *message, const uint8_t *bitmap)
@@ -387,42 +415,6 @@ static void Renderer_DrawMessage(GxEPD_Class *display, const char *message, cons
     display->update();
 }
 
-void Renderer_RenderLoading(GxEPD_Class *display)
-{
-    const char *message = "Atualizando dados";
-    Renderer_DrawMessage(display, message, wi_cloud_refresh_64x64);
-}
-
-void Renderer_RenderWifiError(GxEPD_Class *display)
-{
-    const char *message = "Erro de rede";
-    Renderer_DrawMessage(display, message, wifi_off_64x64);
-}
-
-void Renderer_RenderSystemStatus(GxEPD_Class *display, time_t *updatetime, int batlevel)
-{
-    int xaxis = 260, yaxis = 14;
-    display->setFont(&TomThumb);
-
-    display->drawBitmap(wi_cloud_down_24x24, xaxis, 0, 24, 24, GxEPD_BLACK, GxEPD::bm_mode::bm_invert);
-    display->setCursor((xaxis += 28), yaxis);
-
-    char buff[32];
-    *updatetime += (TIMEZONE_OFFSET * 3600);
-    struct tm ts = *localtime(updatetime);
-    strftime(buff, sizeof(buff), "%d/%m - %H:%M", &ts);
-    display->printf(buff);
-
-    const unsigned char *baticon[] = {battery_0_bar_90deg_24x24, battery_2_bar_90deg_24x24, battery_4_bar_90deg_24x24,
-                                      battery_6_bar_90deg_24x24, battery_full_90deg_24x24};
-
-    int batindex = (batlevel < 0) ? 0 : (batlevel >= 100) ? 4 : (batlevel - 1) / 25;
-
-    display->drawBitmap(baticon[batindex], (xaxis += 56), 0, 24, 24, GxEPD_BLACK, GxEPD::bm_mode::bm_invert);
-    display->setCursor((xaxis += 28), yaxis);
-    display->printf("%d%%", batlevel);
-}
-
 void Renderer_Render(GxEPD_Class *display, WeatherapiResponse_t *weather)
 {
     if (weather == NULL)
@@ -438,4 +430,16 @@ void Renderer_Render(GxEPD_Class *display, WeatherapiResponse_t *weather)
     Renderer_RenderSystemStatus(display, (time_t *)(&weather->current.dt), 0);
 
     display->update();
+}
+
+void Renderer_RenderLoading(GxEPD_Class *display)
+{
+    const char *message = "Atualizando dados";
+    Renderer_DrawMessage(display, message, wi_cloud_refresh_64x64);
+}
+
+void Renderer_RenderWifiError(GxEPD_Class *display)
+{
+    const char *message = "Erro de rede";
+    Renderer_DrawMessage(display, message, wifi_off_64x64);
 }
