@@ -39,6 +39,9 @@ var = os.path.basename(outputfile)
 var = var.rsplit('.h',1)[0]
 
 width, height = src_image.size
+defineguards = "_"+var.capitalize()+"_H_"
+f.write("#ifndef " + defineguards)
+f.write("#define " + defineguards)
 f.write("// " + str(width) + " x " + str(height) + "\n")
 f.write("const unsigned char " + var + "[] = {\n ")
 
@@ -73,5 +76,6 @@ for i in range(n):
 
 tmp_bite <<= BITS_PER_BITE - bit_cnt
 f.write(" " + "0x{:02x}".format(tmp_bite) + "\n};")
+f.write("#endif // !"+defineguards)
 f.close()
 

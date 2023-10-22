@@ -31,6 +31,9 @@ struct WeatherapiDescCurrentWeather_t
     unsigned long sunset;
     float temp;
     float feels_like;
+    float tmax;
+    float tmin;
+    float uvi;
     unsigned int pressure;
     u_int8_t humidity;
     u_int8_t clouds;
@@ -56,6 +59,13 @@ typedef struct WeatherapiResponse_t
     struct WeatherapiDescAlerts_t alerts[MAX_WEATHER_ALERTS];
 } WeatherapiResponse_t;
 
-WeatherapiResponse_t *Weather_GetDeserializedOnecall(void);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+    WeatherapiResponse_t *Weather_GetDeserializedOnecall(void);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -3,7 +3,14 @@
 
 #include <esp_err.h>
 #include <esp_system.h>
-bool Wifi_Initialize(const char *ssid, const char *password);
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+    bool Wifi_Initialize();
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _WIFI_H_ */
-

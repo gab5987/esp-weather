@@ -69,6 +69,7 @@ WeatherapiResponse_t *Weather_GetDeserializedOnecall(void)
         cJSON_get_value_number(current, deserialized_response.current.visibility, "visibility", false);
         cJSON_get_value_number(current, deserialized_response.current.wind_speed, "wind_speed", false);
         cJSON_get_value_number(current, deserialized_response.current.wind_deg, "wind_deg", false);
+        cJSON_get_value_number(current, deserialized_response.current.uvi, "uvi", true);
 
         const char *weather_key = "weather";
         cJSON *json_weather_name = cJSON_GetObjectItemCaseSensitive(current, weather_key);
@@ -79,6 +80,7 @@ WeatherapiResponse_t *Weather_GetDeserializedOnecall(void)
                 if (i == DAILY_MAX_WEATHER_REPORT)
                     break;
                 cJSON *subitem = cJSON_GetArrayItem(json_weather_name, i);
+                cJSON_get_value_number(subitem, deserialized_response.current.weather[i].id, "id", false);
                 cJSON_get_value_string(subitem, deserialized_response.current.weather[i].main, "main");
                 cJSON_get_value_string(subitem, deserialized_response.current.weather[i].description, "description");
             }
@@ -90,6 +92,13 @@ WeatherapiResponse_t *Weather_GetDeserializedOnecall(void)
     if (check_json_err(json_forecast, &err, daily_key))
     {
         int max_forecast_in_array = cJSON_GetArraySize(json_forecast);
+        if (max_forecast_in_array > 1)
+        {
+            cJSON *subitem = cJSON_GetArrayItem(json_forecast, 0);
+            cJSON *temp = cJSON_GetObjectItemCaseSensitive(subitem, "temp");
+            cJSON_get_value_number(temp, deserialized_response.current.tmax, "max", true);
+            cJSON_get_value_number(temp, deserialized_response.current.tmin, "min", true);
+        }
         for (int i = 0; i < MAX_DAYS_FORECAST; i++)
         {
             if (i == max_forecast_in_array)

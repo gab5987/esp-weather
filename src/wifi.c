@@ -7,8 +7,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/event_groups.h>
 #include <freertos/task.h>
-#include <lwip/err.h>
-#include <lwip/sys.h>
 #include <nvs_flash.h>
 #include <string.h>
 
@@ -40,7 +38,6 @@ static void Wifi_EventHandler(void *arg, esp_event_base_t event_base, int32_t ev
         {
             esp_wifi_connect();
             s_retry_num++;
-            ESP_LOGI(TAG, "retry to connect to the AP");
         }
         else
         {
@@ -50,14 +47,12 @@ static void Wifi_EventHandler(void *arg, esp_event_base_t event_base, int32_t ev
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
-        ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
-        ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     }
 }
 
-bool Wifi_Initialize(const char *ssid, const char *password)
+bool Wifi_Initialize()
 {
     s_wifi_event_group = xEventGroupCreate();
 
@@ -79,10 +74,8 @@ bool Wifi_Initialize(const char *ssid, const char *password)
     wifi_config_t wifi_config = {
         .sta =
             {
-                .ssid = WIFI_SSID,
-                .password = WIFI_PASS,
-                .threshold.authmode = WIFI_AUTH_WPA_PSK,
-                .sae_h2e_identifier = "",
+                .ssid = WIFI_SSID, .password = WIFI_PASS, .threshold.authmode = WIFI_AUTH_WPA_PSK,
+                // .sae_h2e_identifier = "",
             },
     };
 
@@ -106,7 +99,7 @@ bool Wifi_Initialize(const char *ssid, const char *password)
     }
     if (bits & WIFI_FAIL_BIT)
     {
-        ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s", ssid, password);
+        ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s", WIFI_SSID, WIFI_PASS);
     }
     else
     {
