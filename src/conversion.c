@@ -30,7 +30,7 @@ int Conv_Epoch2DayOfWeek(const unsigned long *epoch_time)
 
 void Conv_DayOfWeek2String(unsigned int dayofweek, char buff[4])
 {
-    static const char *week[7] = {"SEG", "TER", "QUA", "QUI", "SEX", "SAB", "DOM"};
+    static const char *week[7] = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
     if (dayofweek > 7 || dayofweek < 0)
         return;
     memcpy(buff, week[dayofweek], 4);

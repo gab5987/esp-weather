@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "config.h"
 #include "conversion.h"
 #include <stdio.h>
 #include <string.h>
@@ -398,6 +399,30 @@ void Renderer_RenderWifiError(GxEPD_Class *display)
     Renderer_DrawMessage(display, message, wifi_off_64x64);
 }
 
+void Renderer_RenderSystemStatus(GxEPD_Class *display, time_t *updatetime, int batlevel)
+{
+    int xaxis = 260, yaxis = 14;
+    display->setFont(&TomThumb);
+
+    display->drawBitmap(wi_cloud_down_24x24, xaxis, 0, 24, 24, GxEPD_BLACK, GxEPD::bm_mode::bm_invert);
+    display->setCursor((xaxis += 28), yaxis);
+
+    char buff[32];
+    *updatetime += (TIMEZONE_OFFSET * 3600);
+    struct tm ts = *localtime(updatetime);
+    strftime(buff, sizeof(buff), "%d/%m - %H:%M", &ts);
+    display->printf(buff);
+
+    const unsigned char *baticon[] = {battery_0_bar_90deg_24x24, battery_2_bar_90deg_24x24, battery_4_bar_90deg_24x24,
+                                      battery_6_bar_90deg_24x24, battery_full_90deg_24x24};
+
+    int batindex = (batlevel < 0) ? 0 : (batlevel >= 100) ? 4 : (batlevel - 1) / 25;
+
+    display->drawBitmap(baticon[batindex], (xaxis += 56), 0, 24, 24, GxEPD_BLACK, GxEPD::bm_mode::bm_invert);
+    display->setCursor((xaxis += 28), yaxis);
+    display->printf("%d%%", batlevel);
+}
+
 void Renderer_Render(GxEPD_Class *display, WeatherapiResponse_t *weather)
 {
     if (weather == NULL)
@@ -410,6 +435,7 @@ void Renderer_Render(GxEPD_Class *display, WeatherapiResponse_t *weather)
 
     Renderer_RenderWeeklyForecast(display, weather->daily);
     Renderer_RenderCurrentWeather(display, &weather->current);
+    Renderer_RenderSystemStatus(display, (time_t *)(&weather->current.dt), 0);
 
     display->update();
 }
