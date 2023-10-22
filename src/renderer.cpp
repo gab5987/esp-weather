@@ -317,8 +317,8 @@ void Renderer_RenderWeeklyForecast(GxEPD_Class *display, struct WeatherapiDescDa
 static void Renderer_DrawInfo(GxEPD_Class *display, const uint8_t *bitmap, int x, int y, const char *label,
                               const char *info)
 {
-    display->drawBitmap(bitmap, x, (y += 26), 32, 32, GxEPD_BLACK, GxEPD::bm_mode::bm_invert);
-    display->setCursor((x + 36), (y += 8));
+    display->drawBitmap(bitmap, x, (y + 20), 32, 32, GxEPD_BLACK, GxEPD::bm_mode::bm_invert);
+    display->setCursor((x + 36), (y += 34));
     display->print(label);
     display->setCursor((x + 36), y + 14);
     display->print(info);
@@ -339,15 +339,12 @@ void Renderer_RenderCurrentWeather(GxEPD_Class *display, struct WeatherapiDescCu
     display->setCursor((xaxis + 76), (yaxis += 16));
     display->printf("%dC|%dC", (int)Conv_Kelvin2Celcius(weather->tmax), (int)Conv_Kelvin2Celcius(weather->tmin));
 
-    char buff[12] = {'\n'};
+    char buff[16] = {'\n'};
 
     Conv_Epoch2TimeString(&weather->sunrise, buff);
     Renderer_DrawInfo(display, wi_sunrise_32x32, xaxis, yaxis, "Sunrise", buff);
     Conv_Epoch2TimeString(&weather->sunset, buff);
     Renderer_DrawInfo(display, wi_sunset_32x32, (xaxis += INFO_SECTION_SIZE), yaxis, "Sunset", buff);
-
-    // sprintf(buff, "%s%dKm", weather->visibility >= 10000 ? "<" : "", weather->visibility / 1000);
-    // Renderer_DrawInfo(display, visibility_icon_32x32, (xaxis += INFO_SECTION_SIZE), yaxis, "Distance", buff);
 
     sprintf(buff, "%d%%", weather->clouds);
     Renderer_DrawInfo(display, wi_cloud_32x32, (xaxis += INFO_SECTION_SIZE), yaxis, "Clouds", buff);
@@ -360,6 +357,17 @@ void Renderer_RenderCurrentWeather(GxEPD_Class *display, struct WeatherapiDescCu
 
     sprintf(buff, "%d%%", weather->humidity);
     Renderer_DrawInfo(display, wi_humidity_32x32, (xaxis += INFO_SECTION_SIZE), yaxis, "Humidity", buff);
+
+    const char *compass[8] = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+    const unsigned char *compass_icons[8] = {wi_wind_180deg_32x32, wi_wind_225deg_32x32, wi_wind_270deg_32x32,
+                                             wi_wind_315deg_32x32, wi_wind_0deg_32x32,   wi_wind_45deg_32x32,
+                                             wi_wind_90deg_32x32,  wi_wind_135deg_32x32};
+    int windspeed = (int)(3.6 * weather->wind_speed);
+    int winddir = (weather->wind_deg + 360) % 360;
+    winddir = (winddir + 22) / 45;
+
+    sprintf(buff, "%d Km/h %s", windspeed, compass[winddir]);
+    Renderer_DrawInfo(display, compass_icons[winddir], (xaxis = 200), (yaxis = 6), "Wind", buff);
 }
 
 static void Renderer_DrawMessage(GxEPD_Class *display, const char *message, const uint8_t *bitmap)
