@@ -11,8 +11,6 @@ GxEPD_Class display(io, 16, 4);
 
 __attribute__((noreturn)) void setup(void)
 {
-    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
-
     esp_err_t ret = nvs_flash_init();
 
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
@@ -38,15 +36,12 @@ __attribute__((noreturn)) void setup(void)
     Wifi_Disable();
     display.powerDown();
 
-    esp_sleep_enable_timer_wakeup(900000000 /* 15 minutes */);
+    esp_sleep_enable_timer_wakeup(150000000 /* 1.5 minutes */);
     esp_deep_sleep_start();
 
+    /* Shall never get here */
     ESP_LOGE("MAIN", "Failed to deep sleep");
-    for (;;)
-    {
-        vTaskDelay(100);
-        // Must never get here
-    }
+    esp_restart();
 }
 
 void loop(void)
